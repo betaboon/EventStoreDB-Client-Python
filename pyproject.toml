@@ -1,0 +1,14 @@
+[tool.poetry]
+name = "eventstoredb"
+version = "0.1.0"
+description = ""
+authors = ["betaboon <betaboon@0x80.ninja>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
