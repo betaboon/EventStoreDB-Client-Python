@@ -9,6 +9,18 @@ python = "^3.9"
 
 [tool.poetry.dev-dependencies]
 
+[tool.taskipy.tasks.protobuf-update]
+use_vars = true
+help = "update EventStore-submodule to version provided in env VERSION"
+cmd = """
+[ -z "$VERSION" ] && echo "environment-variable VERSION not provided" || \
+(
+  cd {protoc_in_path} && \
+  git fetch --depth 1 origin $VERSION && \
+  git checkout FETCH_HEAD
+)
+"""
+
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
