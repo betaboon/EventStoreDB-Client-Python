@@ -21,6 +21,11 @@ from eventstoredb.streams.read import (
     convert_read_response,
     ReadStreamOptions,
 )
+from eventstoredb.streams.subscribe import (
+    create_stream_subscription_options,
+    Subscription,
+    SubscribeToStreamOptions,
+)
 
 
 class Client:
@@ -62,3 +67,14 @@ class Client:
         # TODO raise exception StreamNotFoundError
         async for response in client.read(options=request_options):
             yield convert_read_response(response)
+
+    def subscribe_to_stream(
+        self, stream_name: str, options: Optional[SubscribeToStreamOptions] = None
+    ) -> Subscription:
+        client = StreamsStub(channel=self.channel)
+        request_options = create_stream_subscription_options(
+            stream_name=stream_name,
+            options=options,
+        )
+        it = client.read(options=request_options)
+        return Subscription(it)
