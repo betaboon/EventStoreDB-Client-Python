@@ -1,5 +1,5 @@
 import asyncio
-from typing import Optional, List, Callable
+from typing import Optional, List, Callable, Awaitable
 from dataclasses import dataclass
 from operator import itemgetter
 
@@ -7,6 +7,10 @@ import requests
 
 from eventstoredb.events import JsonEvent, ReadEvent
 from eventstoredb.streams.subscribe import Subscription
+from eventstoredb.persistent_subscriptions.subscribe import PersistentSubscription
+from eventstoredb.persistent_subscriptions.subscribe.types import (
+    PersistentSubscriptionEvent,
+)
 
 
 def json_test_events(amount: int) -> List[JsonEvent]:
@@ -72,6 +76,33 @@ class Subscriber:
     async def _consume(self):
         async for event in self._subscription:
             self.event_handler(event)
+
+    async def _stop(self):
+        self._task.cancel()
+        try:
+            await self._task
+        except asyncio.CancelledError:
+            pass
+
+
+class PersistentSubscriber:
+    def __init__(self, loop):
+        self._loop = loop
+        self._subscription: PersistentSubscription
+        self.event_handler: Callable[[PersistentSubscriptionEvent], Awaitable[None]]
+
+    @property
+    def subscription(self):
+        return self._subscription
+
+    @subscription.setter
+    def subscription(self, value):
+        self._subscription = value
+        self._task = self._loop.create_task(self._consume())
+
+    async def _consume(self):
+        async for event in self._subscription:
+            await self.event_handler(event)
 
     async def _stop(self):
         self._task.cancel()

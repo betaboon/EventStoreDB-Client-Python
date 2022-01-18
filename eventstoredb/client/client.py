@@ -46,6 +46,10 @@ from eventstoredb.persistent_subscriptions.delete import (
     create_delete_request_options,
     DeletePersistentSubscriptionOptions,
 )
+from eventstoredb.persistent_subscriptions.subscribe import (
+    PersistentSubscription,
+    SubscribeToPersistentSubscriptionOptions,
+)
 
 
 class Client:
@@ -149,3 +153,17 @@ class Client:
             await client.delete(options=request_options)
         except GRPCError as e:
             raise convert_grpc_error_to_exception(e)
+
+    def subscribe_to_persistent_subscription(
+        self,
+        stream_name: str,
+        group_name: str,
+        options: Optional[SubscribeToPersistentSubscriptionOptions] = None,
+    ) -> PersistentSubscription:
+        client = PersistentSubscriptionsStub(channel=self.channel)
+        return PersistentSubscription(
+            client=client,
+            stream_name=stream_name,
+            group_name=group_name,
+            options=options,
+        )
