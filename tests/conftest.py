@@ -70,3 +70,8 @@ def eventstoredb_httpclient(eventstoredb_host, eventstoredb_port):
 @pytest.fixture
 def stream_name():
     return f"test-stream-{uuid.uuid4()}"
+
+
+@pytest.fixture
+def group_name():
+    return f"test-group-{uuid.uuid4()}"

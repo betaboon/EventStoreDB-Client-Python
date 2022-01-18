@@ -1,8 +1,13 @@
 from typing import Union, Optional, Iterable, AsyncIterator
 
 from grpclib.client import Channel
+from grpclib.exceptions import GRPCError
 
 from eventstoredb.generated.event_store.client.streams import StreamsStub
+from eventstoredb.generated.event_store.client.persistent_subscriptions import (
+    PersistentSubscriptionsStub,
+)
+
 
 from eventstoredb.client.types import ClientOptions
 from eventstoredb.events import (
@@ -25,6 +30,13 @@ from eventstoredb.streams.subscribe import (
     create_stream_subscription_options,
     Subscription,
     SubscribeToStreamOptions,
+)
+from eventstoredb.persistent_subscriptions.common import (
+    convert_grpc_error_to_exception,
+)
+from eventstoredb.persistent_subscriptions.create import (
+    create_create_request_options,
+    CreatePersistentSubscriptionOptions,
 )
 
 
@@ -78,3 +90,20 @@ class Client:
         )
         it = client.read(options=request_options)
         return Subscription(it)
+
+    async def create_persistent_subscription(
+        self,
+        stream_name: str,
+        group_name: str,
+        options: Optional[CreatePersistentSubscriptionOptions] = None,
+    ) -> None:
+        client = PersistentSubscriptionsStub(channel=self.channel)
+        request_options = create_create_request_options(
+            stream_name=stream_name,
+            group_name=group_name,
+            options=options,
+        )
+        try:
+            await client.create(options=request_options)
+        except GRPCError as e:
+            raise convert_grpc_error_to_exception(e)

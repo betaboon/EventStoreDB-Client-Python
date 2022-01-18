@@ -41,6 +41,18 @@ class EventstoreHTTP:
             events = data.get("entries")
             return sorted(events, key=itemgetter("positionEventNumber"))
 
+    def get_persistent_subscriptions(self, stream_name: Optional[str] = None):
+        url = f"{self.url}/subscriptions"
+        if stream_name:
+            url = f"{url}/{stream_name}"
+        response = requests.get(url=url)
+        return response.json()
+
+    def get_persistent_subscription_details(self, stream_name: str, group_name: str):
+        url = f"{self.url}/subscriptions/{stream_name}/{group_name}/info"
+        response = requests.get(url=url)
+        return response.json()
+
 
 class Subscriber:
     def __init__(self, loop):
