@@ -6,8 +6,27 @@ authors = ["betaboon <betaboon@0x80.ninja>"]
 
 [tool.poetry.dependencies]
 python = "^3.9"
+betterproto = "2.0.0-beta4"
 
 [tool.poetry.dev-dependencies]
+betterproto = {version = "2.0.0b4", extras = ["compiler"]}
+grpcio-tools = "^1.43.0"
+taskipy = "^1.9.0"
+
+[tool.taskipy.variables]
+protoc_in_path = "./external/EventStore/src/Protos/Grpc"
+protoc_out_path = "./eventstoredb/generated"
+
+[tool.taskipy.tasks.protobuf-generate]
+use_vars = true
+help = "generate grpc-code from protobuf-definitions"
+cmd = """
+  mkdir -p {protoc_out_path} &&
+  python -m grpc_tools.protoc \
+    --proto_path={protoc_in_path} \
+    --python_betterproto_out={protoc_out_path} \
+    {protoc_in_path}/*.proto
+"""
 
 [tool.taskipy.tasks.protobuf-update]
 use_vars = true
