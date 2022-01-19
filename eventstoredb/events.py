@@ -54,3 +54,36 @@ class JsonEvent(EventData):
 @dataclass
 class BinaryEvent(EventData):
     content_type: Literal[ContentType.BINARY] = ContentType.BINARY
+
+
+@dataclass
+class RecordedEvent:
+    stream_name: str
+    id: UUID
+    type: str
+    content_type: ContentType
+    revision: int
+    created: int
+    position: Position
+
+
+@dataclass
+class JsonRecordedEvent(RecordedEvent):
+    # TODO it would be great not to use Any here
+    data: Optional[Any]
+    # TODO it would be great not to use Any here
+    metadata: Optional[Any]
+
+
+@dataclass
+class BinaryRecordedEvent(RecordedEvent):
+    data: Optional[bytes]
+    metadata: Optional[bytes]
+
+
+# TODO does this belong to streams/read/types?
+@dataclass
+class ReadEvent:
+    event: Optional[RecordedEvent] = None
+    link: Optional[RecordedEvent] = None
+    commit_position: Optional[int] = None

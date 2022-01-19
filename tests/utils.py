@@ -1,8 +1,17 @@
-from typing import Optional
+from typing import Optional, List
 from dataclasses import dataclass
 from operator import itemgetter
 
 import requests
+
+from eventstoredb.events import JsonEvent
+
+
+def json_test_events(amount: int) -> List[JsonEvent]:
+    events = []
+    for i in range(amount):
+        events.append(JsonEvent(type=f"Test{i+1}"))
+    return events
 
 
 @dataclass
