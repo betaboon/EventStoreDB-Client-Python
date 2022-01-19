@@ -1,0 +1,4 @@
+[submodule "external/EventStore"]
+	path = external/EventStore
+	url = https://github.com/EventStore/EventStore.git
+	shallow = true
