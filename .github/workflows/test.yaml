@@ -1,25 +1,31 @@
 name: Test
-on: [pull_request]
+
+on:
+  - pull_request
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-20.04]
+        python-version: ["3.9", "3.10"]
+    runs-on: ${{ matrix.os }}
     steps:
       - name: Checkout
         uses: actions/checkout@v2
         with:
           fetch-depth: 0
-      - name: Python 3.9
+      - name: Setup Python
         uses: actions/setup-python@v2
         with:
-          python-version: 3.9
-      - name: Poetry
+          python-version: ${{ matrix.python-version }}
+      - name: Setup Poetry
         uses: Gr1N/setup-poetry@v7
       - name: Cache dependencies
         uses: actions/cache@v2
         with:
           path: ~/.cache/pypoetry/virtualenvs
-          key: ${{ runner.os }}-poetry-${{ hashFiles('poetry.lock') }}
+          key: os-${{ matrix.os }}-python-${{ matrix.python-version }}-${{ hashFiles('poetry.lock') }}
       - name: Install dependencies
         run: poetry install
       - name: Run tests
