@@ -1,11 +1,10 @@
-name: Test
+name: Build
 
 on:
-  - pull_request
   - workflow_call
 
 jobs:
-  test:
+  build:
     strategy:
       matrix:
         os: [ubuntu-20.04]
@@ -31,3 +30,12 @@ jobs:
         run: poetry install
       - name: Run tests
         run: poetry run task test
+      - name: Build
+        run: poetry build
+      - name: Upload build output
+        uses: actions/upload-artifact@v3
+        with:
+          name: build-output
+          path: ${{ github.workspace }}/dist/*
+          retention-days: 1
+          if-no-files-found: error
