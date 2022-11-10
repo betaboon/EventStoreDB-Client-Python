@@ -5,11 +5,10 @@ from pytest_mock import MockerFixture
 
 from eventstoredb import Client
 from eventstoredb.events import JsonEvent
-from eventstoredb.streams.types import StreamPosition
 from eventstoredb.streams.subscribe import SubscribeToStreamOptions
+from eventstoredb.streams.types import StreamPosition
 
-from ..utils import json_test_events, Subscriber
-
+from ..utils import Subscriber, json_test_events
 
 pytestmark = pytest.mark.asyncio
 

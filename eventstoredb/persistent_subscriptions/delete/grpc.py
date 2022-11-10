@@ -4,7 +4,6 @@ from eventstoredb.generated.event_store.client import StreamIdentifier
 from eventstoredb.generated.event_store.client.persistent_subscriptions import (
     DeleteReqOptions,
 )
-
 from eventstoredb.persistent_subscriptions.delete.types import (
     DeletePersistentSubscriptionOptions,
 )

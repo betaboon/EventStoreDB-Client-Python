@@ -1,10 +1,8 @@
 import asyncio
 import logging
 
-
 from eventstoredb import Client, ClientOptions
 from eventstoredb.generated.event_store.client.persistent_subscriptions import UpdateReq
-
 from eventstoredb.persistent_subscriptions.common.exceptions import (
     PersistentSubscriptionError,
 )

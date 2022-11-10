@@ -1,12 +1,9 @@
 from typing import TypeVar
 
-from grpclib.exceptions import GRPCError
 from grpclib.const import Status as GRPCStatus
+from grpclib.exceptions import GRPCError
 
-from eventstoredb.generated.event_store.client import (
-    Empty,
-    StreamIdentifier,
-)
+from eventstoredb.generated.event_store.client import Empty, StreamIdentifier
 from eventstoredb.generated.event_store.client.persistent_subscriptions import (
     CreateReqConsumerStrategy,
     CreateReqOptions,
@@ -17,12 +14,6 @@ from eventstoredb.generated.event_store.client.persistent_subscriptions import (
     UpdateReqSettings,
     UpdateReqStreamOptions,
 )
-
-from eventstoredb.streams.types import StreamPosition, StreamRevision
-from eventstoredb.persistent_subscriptions.common.types import (
-    ConsumerStrategy,
-    CreateUpdatePersistentSubscriptionOptions,
-)
 from eventstoredb.persistent_subscriptions.common.exceptions import (
     PersistentSubscriptionDoesNotExistError,
     PersistentSubscriptionDroppedError,
@@ -31,6 +22,11 @@ from eventstoredb.persistent_subscriptions.common.exceptions import (
     PersistentSubscriptionFailedError,
     PersistentSubscriptionMaxSubscribersReachedError,
 )
+from eventstoredb.persistent_subscriptions.common.types import (
+    ConsumerStrategy,
+    CreateUpdatePersistentSubscriptionOptions,
+)
+from eventstoredb.streams.types import StreamPosition, StreamRevision
 
 Options = TypeVar("Options", CreateReqOptions, UpdateReqOptions)
 

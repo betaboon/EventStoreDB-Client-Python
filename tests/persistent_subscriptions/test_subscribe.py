@@ -11,7 +11,8 @@ from eventstoredb.persistent_subscriptions.subscribe.types import (
     PersistentSubscriptionEvent,
 )
 from eventstoredb.streams.types import StreamPosition
-from ..utils import json_test_events, PersistentSubscriber
+
+from ..utils import PersistentSubscriber, json_test_events
 
 pytestmark = pytest.mark.asyncio
 

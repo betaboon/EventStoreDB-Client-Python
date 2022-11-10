@@ -1,9 +1,8 @@
-from typing import Optional, AsyncIterator
+from typing import AsyncIterator, Optional
 from uuid import UUID
 
-from eventstoredb.generated.event_store.client.streams import ReadResp
-
 from eventstoredb.events import ReadEvent
+from eventstoredb.generated.event_store.client.streams import ReadResp
 from eventstoredb.streams.subscribe.grpc import convert_read_response
 from eventstoredb.streams.subscribe.types import SubscriptionConfirmation
 

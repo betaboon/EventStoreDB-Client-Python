@@ -3,7 +3,6 @@ from typing import Optional
 from eventstoredb.generated.event_store.client.persistent_subscriptions import (
     CreateReqOptions,
 )
-
 from eventstoredb.persistent_subscriptions.common.grpc import (
     create_create_update_request_options,
 )

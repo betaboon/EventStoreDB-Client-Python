@@ -2,11 +2,8 @@ from typing import Optional
 
 import betterproto
 
-from eventstoredb.generated.event_store.client import (
-    Empty,
-    StreamIdentifier,
-    Uuid,
-)
+from eventstoredb.events import EventData, Position
+from eventstoredb.generated.event_store.client import Empty, StreamIdentifier, Uuid
 from eventstoredb.generated.event_store.client.streams import (
     AppendReq,
     AppendReqOptions,
@@ -15,20 +12,18 @@ from eventstoredb.generated.event_store.client.streams import (
     AppendRespSuccess,
     AppendRespWrongExpectedVersion,
 )
-
-from eventstoredb.events import EventData, Position
-from eventstoredb.streams.types import StreamRevision
-from eventstoredb.streams.append.types import (
-    AppendToStreamOptions,
-    AppendExpectedRevision,
-    AppendResult,
-)
 from eventstoredb.streams.append.exceptions import (
-    WrongExpectedRevisionError,
+    RevisionMismatchError,
     StreamExistsError,
     StreamNotFoundError,
-    RevisionMismatchError,
+    WrongExpectedRevisionError,
 )
+from eventstoredb.streams.append.types import (
+    AppendExpectedRevision,
+    AppendResult,
+    AppendToStreamOptions,
+)
+from eventstoredb.streams.types import StreamRevision
 
 
 def create_append_header(

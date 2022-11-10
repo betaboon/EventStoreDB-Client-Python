@@ -3,23 +3,22 @@ from uuid import UUID
 
 import betterproto
 
+from eventstoredb.events import ReadEvent
 from eventstoredb.generated.event_store.client import Empty, StreamIdentifier
 from eventstoredb.generated.event_store.client.streams import (
     ReadReqOptions,
-    ReadReqOptionsUuidOption,
     ReadReqOptionsStreamOptions,
     ReadReqOptionsSubscriptionOptions,
+    ReadReqOptionsUuidOption,
     ReadResp,
     ReadRespSubscriptionConfirmation,
 )
-
-from eventstoredb.events import ReadEvent
-from eventstoredb.streams.types import StreamPosition, StreamRevision
 from eventstoredb.streams.read.grpc import convert_read_response_read_event
 from eventstoredb.streams.subscribe.types import (
     SubscribeToStreamOptions,
     SubscriptionConfirmation,
 )
+from eventstoredb.streams.types import StreamPosition, StreamRevision
 
 
 def create_stream_subscription_options(

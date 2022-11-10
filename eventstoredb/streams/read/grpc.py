@@ -4,36 +4,26 @@ from uuid import UUID
 
 import betterproto
 
-from eventstoredb.generated.event_store.client import (
-    Empty,
-    StreamIdentifier,
+from eventstoredb.events import (
+    BinaryRecordedEvent,
+    ContentType,
+    JsonRecordedEvent,
+    Position,
+    ReadEvent,
 )
+from eventstoredb.generated.event_store.client import Empty, StreamIdentifier
 from eventstoredb.generated.event_store.client.streams import (
     ReadReqOptions,
     ReadReqOptionsReadDirection,
-    ReadReqOptionsUuidOption,
     ReadReqOptionsStreamOptions,
+    ReadReqOptionsUuidOption,
     ReadResp,
     ReadRespReadEvent,
     ReadRespReadEventRecordedEvent,
 )
-
-from eventstoredb.events import (
-    BinaryRecordedEvent,
-    JsonRecordedEvent,
-    ReadEvent,
-    ContentType,
-    Position,
-)
-from eventstoredb.streams.types import (
-    StreamPosition,
-    StreamRevision,
-)
-from eventstoredb.streams.read.types import (
-    ReadDirection,
-    ReadStreamOptions,
-)
 from eventstoredb.streams.read.exceptions import StreamNotFoundError
+from eventstoredb.streams.read.types import ReadDirection, ReadStreamOptions
+from eventstoredb.streams.types import StreamPosition, StreamRevision
 
 
 def create_read_request_options(

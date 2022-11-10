@@ -1,4 +1,5 @@
 from typing import Union
+
 from eventstoredb.streams.append.types import AppendExpectedRevision
 
 

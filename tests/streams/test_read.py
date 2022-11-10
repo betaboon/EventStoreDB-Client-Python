@@ -1,22 +1,17 @@
-import pytest
 import uuid
 
+import pytest
+
 from eventstoredb import Client
-from eventstoredb.events import (
-    JsonEvent,
-    ReadEvent,
-    RecordedEvent,
-    JsonRecordedEvent,
-)
-from eventstoredb.streams.types import StreamPosition
+from eventstoredb.events import JsonEvent, JsonRecordedEvent, ReadEvent, RecordedEvent
 from eventstoredb.streams.read import (
     ReadDirection,
     ReadStreamOptions,
     StreamNotFoundError,
 )
+from eventstoredb.streams.types import StreamPosition
 
 from ..utils import json_test_events
-
 
 pytestmark = pytest.mark.asyncio
 

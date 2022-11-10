@@ -11,6 +11,7 @@ from eventstoredb.persistent_subscriptions.update.types import (
     UpdatePersistentSubscriptionOptions,
 )
 from eventstoredb.streams.types import StreamPosition
+
 from ..utils import EventstoreHTTP
 
 pytestmark = pytest.mark.asyncio

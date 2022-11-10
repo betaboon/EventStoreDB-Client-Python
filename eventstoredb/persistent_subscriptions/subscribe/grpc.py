@@ -1,14 +1,17 @@
-from typing import Optional, Union, List
-from uuid import UUID
 import json
+from typing import List, Optional, Union
+from uuid import UUID
 
 import betterproto
 
-from eventstoredb.generated.event_store.client import (
-    Empty,
-    StreamIdentifier,
-    Uuid,
+from eventstoredb.events import (
+    BinaryRecordedEvent,
+    ContentType,
+    JsonRecordedEvent,
+    Position,
+    RecordedEvent,
 )
+from eventstoredb.generated.event_store.client import Empty, StreamIdentifier, Uuid
 from eventstoredb.generated.event_store.client.persistent_subscriptions import (
     ReadReq,
     ReadReqAck,
@@ -21,19 +24,11 @@ from eventstoredb.generated.event_store.client.persistent_subscriptions import (
     ReadRespReadEventRecordedEvent,
     ReadRespSubscriptionConfirmation,
 )
-
-from eventstoredb.events import (
-    ContentType,
-    Position,
-    RecordedEvent,
-    JsonRecordedEvent,
-    BinaryRecordedEvent,
-)
 from eventstoredb.persistent_subscriptions.subscribe.types import (
-    SubscribeToPersistentSubscriptionOptions,
+    NackAction,
     PersistentSubscriptionConfirmation,
     PersistentSubscriptionEvent,
-    NackAction,
+    SubscribeToPersistentSubscriptionOptions,
 )
 
 

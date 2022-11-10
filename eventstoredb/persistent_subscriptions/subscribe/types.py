@@ -1,8 +1,7 @@
 from dataclasses import dataclass
-from typing import Optional
 from enum import Enum, auto
+from typing import Optional
 from uuid import UUID
-
 
 from eventstoredb.events import ReadEvent
 

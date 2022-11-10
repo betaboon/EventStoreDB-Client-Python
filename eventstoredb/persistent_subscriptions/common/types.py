@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from enum import Enum, auto
 from typing import Union
 
-from eventstoredb.streams.types import StreamRevision, StreamPosition
+from eventstoredb.streams.types import StreamPosition, StreamRevision
 
 
 class ConsumerStrategy(Enum):

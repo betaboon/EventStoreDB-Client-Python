@@ -1,5 +1,6 @@
-import pytest
 import json
+
+import pytest
 
 from eventstoredb import Client
 from eventstoredb.events import JsonEvent

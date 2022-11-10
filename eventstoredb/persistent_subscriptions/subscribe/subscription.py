@@ -1,6 +1,6 @@
 import asyncio
-from typing import Optional, Union, List, AsyncIterator, AsyncIterable
 import logging
+from typing import AsyncIterable, AsyncIterator, List, Optional, Union
 
 from grpclib.exceptions import GRPCError
 
@@ -12,18 +12,17 @@ from eventstoredb.generated.event_store.client.persistent_subscriptions import (
 from eventstoredb.persistent_subscriptions.common.grpc import (
     convert_grpc_error_to_exception,
 )
-
-from eventstoredb.persistent_subscriptions.subscribe.types import (
-    SubscribeToPersistentSubscriptionOptions,
-    PersistentSubscriptionEvent,
-    PersistentSubscriptionConfirmation,
-    NackAction,
-)
 from eventstoredb.persistent_subscriptions.subscribe.grpc import (
-    create_read_request,
+    convert_read_response,
     create_ack_request,
     create_nack_request,
-    convert_read_response,
+    create_read_request,
+)
+from eventstoredb.persistent_subscriptions.subscribe.types import (
+    NackAction,
+    PersistentSubscriptionConfirmation,
+    PersistentSubscriptionEvent,
+    SubscribeToPersistentSubscriptionOptions,
 )
 
 

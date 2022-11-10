@@ -1,54 +1,47 @@
-from typing import Union, Optional, Iterable, AsyncIterator
+from typing import AsyncIterator, Iterable, Optional, Union
 
 from grpclib.client import Channel
 from grpclib.exceptions import GRPCError
 
-from eventstoredb.generated.event_store.client.streams import StreamsStub
+from eventstoredb.client.types import ClientOptions
+from eventstoredb.events import EventData, ReadEvent
 from eventstoredb.generated.event_store.client.persistent_subscriptions import (
     PersistentSubscriptionsStub,
 )
-
-
-from eventstoredb.client.types import ClientOptions
-from eventstoredb.events import (
-    EventData,
-    ReadEvent,
-)
-from eventstoredb.streams.append import (
-    create_append_header,
-    create_append_request,
-    convert_append_response,
-    AppendResult,
-    AppendToStreamOptions,
-)
-from eventstoredb.streams.read import (
-    create_read_request_options,
-    convert_read_response,
-    ReadStreamOptions,
-)
-from eventstoredb.streams.subscribe import (
-    create_stream_subscription_options,
-    Subscription,
-    SubscribeToStreamOptions,
-)
-from eventstoredb.persistent_subscriptions.common import (
-    convert_grpc_error_to_exception,
-)
+from eventstoredb.generated.event_store.client.streams import StreamsStub
+from eventstoredb.persistent_subscriptions.common import convert_grpc_error_to_exception
 from eventstoredb.persistent_subscriptions.create import (
-    create_create_request_options,
     CreatePersistentSubscriptionOptions,
-)
-from eventstoredb.persistent_subscriptions.update import (
-    create_update_request_options,
-    UpdatePersistentSubscriptionOptions,
+    create_create_request_options,
 )
 from eventstoredb.persistent_subscriptions.delete import (
-    create_delete_request_options,
     DeletePersistentSubscriptionOptions,
+    create_delete_request_options,
 )
 from eventstoredb.persistent_subscriptions.subscribe import (
     PersistentSubscription,
     SubscribeToPersistentSubscriptionOptions,
+)
+from eventstoredb.persistent_subscriptions.update import (
+    UpdatePersistentSubscriptionOptions,
+    create_update_request_options,
+)
+from eventstoredb.streams.append import (
+    AppendResult,
+    AppendToStreamOptions,
+    convert_append_response,
+    create_append_header,
+    create_append_request,
+)
+from eventstoredb.streams.read import (
+    ReadStreamOptions,
+    convert_read_response,
+    create_read_request_options,
+)
+from eventstoredb.streams.subscribe import (
+    SubscribeToStreamOptions,
+    Subscription,
+    create_stream_subscription_options,
 )
 
 

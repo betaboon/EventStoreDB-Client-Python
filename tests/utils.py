@@ -1,16 +1,16 @@
 import asyncio
-from typing import Optional, List, Callable, Awaitable
 from dataclasses import dataclass
 from operator import itemgetter
+from typing import Awaitable, Callable, List, Optional
 
 import requests
 
 from eventstoredb.events import JsonEvent, ReadEvent
-from eventstoredb.streams.subscribe import Subscription
 from eventstoredb.persistent_subscriptions.subscribe import PersistentSubscription
 from eventstoredb.persistent_subscriptions.subscribe.types import (
     PersistentSubscriptionEvent,
 )
+from eventstoredb.streams.subscribe import Subscription
 
 
 def json_test_events(amount: int) -> List[JsonEvent]:

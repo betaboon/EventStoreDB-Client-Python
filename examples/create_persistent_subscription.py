@@ -1,7 +1,6 @@
 import asyncio
 import logging
 
-
 from eventstoredb import Client, ClientOptions
 from eventstoredb.persistent_subscriptions.create.types import (
     CreatePersistentSubscriptionOptions,

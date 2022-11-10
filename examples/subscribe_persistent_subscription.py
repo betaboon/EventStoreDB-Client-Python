@@ -1,7 +1,6 @@
 import asyncio
 import logging
 
-
 from eventstoredb import Client, ClientOptions
 
 logging.basicConfig(level=logging.WARN)
