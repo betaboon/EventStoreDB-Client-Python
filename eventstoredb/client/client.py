@@ -50,7 +50,14 @@ from eventstoredb.streams.subscribe import (
 
 class Client:
     def __init__(self, options: ClientOptions) -> None:
-        self.channel = Channel(host=options.host, port=options.port)
+        self.options = options
+        self._channel: Channel | None = None
+
+    @property
+    def channel(self) -> Channel:
+        if self._channel is None:
+            self._channel = Channel(host=self.options.host, port=self.options.port)
+        return self._channel
 
     async def append_to_stream(
         self,
