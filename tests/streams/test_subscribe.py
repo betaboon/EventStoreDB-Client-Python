@@ -1,4 +1,5 @@
 import asyncio
+from typing import AsyncGenerator
 
 import pytest
 from pytest_mock import MockerFixture
@@ -10,11 +11,12 @@ from eventstoredb.streams.types import StreamPosition
 
 from ..utils import Subscriber, json_test_events
 
-pytestmark = pytest.mark.asyncio
-
 
 @pytest.fixture
-async def subscriber(event_loop, mocker: MockerFixture):
+async def subscriber(
+    event_loop: asyncio.AbstractEventLoop,
+    mocker: MockerFixture,
+) -> AsyncGenerator[Subscriber, None]:
     s = Subscriber(event_loop)
     s.event_handler = mocker.stub()
     yield s
@@ -24,8 +26,8 @@ async def subscriber(event_loop, mocker: MockerFixture):
 async def test_subscribe_to_stream_json(
     eventstoredb_client: Client,
     stream_name: str,
-    subscriber,
-):
+    subscriber: Subscriber,
+) -> None:
     subscription = eventstoredb_client.subscribe_to_stream(stream_name=stream_name)
 
     subscriber.subscription = subscription
@@ -44,8 +46,8 @@ async def test_subscribe_to_stream_json(
 async def test_subscribe_to_stream_from_start(
     eventstoredb_client: Client,
     stream_name: str,
-    subscriber,
-):
+    subscriber: Subscriber,
+) -> None:
     await eventstoredb_client.append_to_stream(
         stream_name=stream_name,
         events=json_test_events(4),
@@ -73,8 +75,8 @@ async def test_subscribe_to_stream_from_start(
 async def test_subscribe_to_stream_from_end(
     eventstoredb_client: Client,
     stream_name: str,
-    subscriber,
-):
+    subscriber: Subscriber,
+) -> None:
     await eventstoredb_client.append_to_stream(
         stream_name=stream_name,
         events=json_test_events(4),
@@ -102,8 +104,8 @@ async def test_subscribe_to_stream_from_end(
 async def test_subscribe_to_stream_from_revision(
     eventstoredb_client: Client,
     stream_name: str,
-    subscriber,
-):
+    subscriber: Subscriber,
+) -> None:
     await eventstoredb_client.append_to_stream(
         stream_name=stream_name,
         events=json_test_events(4),

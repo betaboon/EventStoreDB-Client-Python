@@ -7,7 +7,7 @@ from eventstoredb.events import JsonEvent
 logging.basicConfig(level=logging.WARN)
 
 
-async def main():
+async def main() -> None:
     settings = ClientOptions(host="localhost", port=2113)
     client = Client(settings)
     stream_name = "example-stream"
@@ -18,7 +18,7 @@ async def main():
     print(result)
 
 
-def sync_main():
+def sync_main() -> None:
     asyncio.run(main())
 
 

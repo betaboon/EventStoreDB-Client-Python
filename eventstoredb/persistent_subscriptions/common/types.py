@@ -1,6 +1,7 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Union
 
 from eventstoredb.streams.types import StreamPosition, StreamRevision
 
@@ -29,7 +30,7 @@ class PersistentSubscriptionSettings:
 
 @dataclass
 class CreateUpdatePersistentSubscriptionOptions:
-    from_revision: Union[StreamPosition, StreamRevision] = StreamPosition.START
+    from_revision: StreamPosition | StreamRevision = StreamPosition.START
     settings: PersistentSubscriptionSettings = field(
         default_factory=PersistentSubscriptionSettings
     )

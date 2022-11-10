@@ -1,4 +1,6 @@
-from typing import AsyncIterator, Iterable, Optional, Union
+from __future__ import annotations
+
+from typing import AsyncGenerator, AsyncIterator, Iterable
 
 from grpclib.client import Channel
 from grpclib.exceptions import GRPCError
@@ -27,6 +29,7 @@ from eventstoredb.persistent_subscriptions.update import (
     create_update_request_options,
 )
 from eventstoredb.streams.append import (
+    AppendReq,
     AppendResult,
     AppendToStreamOptions,
     convert_append_response,
@@ -52,20 +55,19 @@ class Client:
     async def append_to_stream(
         self,
         stream_name: str,
-        events: Union[EventData, Iterable[EventData]],
-        options: Optional[AppendToStreamOptions] = None,
+        events: EventData | Iterable[EventData],
+        options: AppendToStreamOptions | None = None,
     ) -> AppendResult:
-
-        if isinstance(events, EventData):
-            events = [events]
-
-        async def request_iterator():
+        async def request_iterator() -> AsyncGenerator[AppendReq, None]:
             yield create_append_header(
                 stream_name=stream_name,
                 options=options,
             )
-            for event in events:
-                yield create_append_request(event)
+            if isinstance(events, EventData):
+                yield create_append_request(events)
+            else:
+                for event in events:
+                    yield create_append_request(event)
 
         client = StreamsStub(channel=self.channel)
         response = await client.append(request_iterator())
@@ -74,7 +76,7 @@ class Client:
     async def read_stream(
         self,
         stream_name: str,
-        options: Optional[ReadStreamOptions] = None,
+        options: ReadStreamOptions | None = None,
     ) -> AsyncIterator[ReadEvent]:
         client = StreamsStub(channel=self.channel)
         request_options = create_read_request_options(
@@ -86,7 +88,9 @@ class Client:
             yield convert_read_response(response)
 
     def subscribe_to_stream(
-        self, stream_name: str, options: Optional[SubscribeToStreamOptions] = None
+        self,
+        stream_name: str,
+        options: SubscribeToStreamOptions | None = None,
     ) -> Subscription:
         client = StreamsStub(channel=self.channel)
         request_options = create_stream_subscription_options(
@@ -100,7 +104,7 @@ class Client:
         self,
         stream_name: str,
         group_name: str,
-        options: Optional[CreatePersistentSubscriptionOptions] = None,
+        options: CreatePersistentSubscriptionOptions | None = None,
     ) -> None:
         client = PersistentSubscriptionsStub(channel=self.channel)
         request_options = create_create_request_options(
@@ -117,7 +121,7 @@ class Client:
         self,
         stream_name: str,
         group_name: str,
-        options: Optional[UpdatePersistentSubscriptionOptions] = None,
+        options: UpdatePersistentSubscriptionOptions | None = None,
     ) -> None:
         client = PersistentSubscriptionsStub(channel=self.channel)
         request_options = create_update_request_options(
@@ -134,7 +138,7 @@ class Client:
         self,
         stream_name: str,
         group_name: str,
-        options: Optional[DeletePersistentSubscriptionOptions] = None,
+        options: DeletePersistentSubscriptionOptions | None = None,
     ) -> None:
         client = PersistentSubscriptionsStub(channel=self.channel)
         request_options = create_delete_request_options(
@@ -151,7 +155,7 @@ class Client:
         self,
         stream_name: str,
         group_name: str,
-        options: Optional[SubscribeToPersistentSubscriptionOptions] = None,
+        options: SubscribeToPersistentSubscriptionOptions | None = None,
     ) -> PersistentSubscription:
         client = PersistentSubscriptionsStub(channel=self.channel)
         return PersistentSubscription(

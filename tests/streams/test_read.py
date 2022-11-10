@@ -1,4 +1,5 @@
 import uuid
+from typing import Any
 
 import pytest
 
@@ -13,10 +14,8 @@ from eventstoredb.streams.types import StreamPosition
 
 from ..utils import json_test_events
 
-pytestmark = pytest.mark.asyncio
 
-
-def recorded_event_type(x):
+def recorded_event_type(x: Any) -> str:
     __tracebackhide__ = True
     if not isinstance(x, ReadEvent):
         pytest.fail(f"not a ReadEvent: {x}")
@@ -27,16 +26,19 @@ def recorded_event_type(x):
 
 
 @pytest.mark.xfail
-def test_recorded_event_type_wrong_type():
+def test_recorded_event_type_wrong_type() -> None:
     assert recorded_event_type(None) == "Foo"
 
 
 @pytest.mark.xfail
-def test_recorded_event_type_no_event():
+def test_recorded_event_type_no_event() -> None:
     assert recorded_event_type(ReadEvent()) == "Foo"
 
 
-async def test_read_stream_json(eventstoredb_client: Client, stream_name):
+async def test_read_stream_json(
+    eventstoredb_client: Client,
+    stream_name: str,
+) -> None:
     await eventstoredb_client.append_to_stream(
         stream_name=stream_name,
         events=[JsonEvent(type="Test", data={"some": "data"})],
@@ -58,15 +60,18 @@ async def test_read_stream_json(eventstoredb_client: Client, stream_name):
     assert isinstance(event, JsonRecordedEvent)
     assert event.data is not None
     assert event.data == {"some": "data"}
-    assert event.metadata == None
+    assert event.metadata is None
 
 
 @pytest.mark.skip(reason="test not implemented")
-async def test_read_stream_binary():
+async def test_read_stream_binary() -> None:
     pass
 
 
-async def test_read_stream_from_start(eventstoredb_client: Client, stream_name):
+async def test_read_stream_from_start(
+    eventstoredb_client: Client,
+    stream_name: str,
+) -> None:
     await eventstoredb_client.append_to_stream(
         stream_name=stream_name,
         events=json_test_events(4),
@@ -85,7 +90,10 @@ async def test_read_stream_from_start(eventstoredb_client: Client, stream_name):
     assert recorded_event_type(events[3]) == "Test4"
 
 
-async def test_read_stream_from_revision(eventstoredb_client: Client, stream_name):
+async def test_read_stream_from_revision(
+    eventstoredb_client: Client,
+    stream_name: str,
+) -> None:
     await eventstoredb_client.append_to_stream(
         stream_name=stream_name,
         events=json_test_events(4),
@@ -102,7 +110,10 @@ async def test_read_stream_from_revision(eventstoredb_client: Client, stream_nam
     assert recorded_event_type(events[1]) == "Test4"
 
 
-async def test_read_stream_backwards_from_end(eventstoredb_client: Client, stream_name):
+async def test_read_stream_backwards_from_end(
+    eventstoredb_client: Client,
+    stream_name: str,
+) -> None:
     await eventstoredb_client.append_to_stream(
         stream_name=stream_name,
         events=json_test_events(4),
@@ -125,8 +136,9 @@ async def test_read_stream_backwards_from_end(eventstoredb_client: Client, strea
 
 
 async def test_read_stream_backwards_from_revision(
-    eventstoredb_client: Client, stream_name
-):
+    eventstoredb_client: Client,
+    stream_name: str,
+) -> None:
     await eventstoredb_client.append_to_stream(
         stream_name=stream_name,
         events=json_test_events(4),
@@ -146,7 +158,10 @@ async def test_read_stream_backwards_from_revision(
     assert recorded_event_type(events[1]) == "Test1"
 
 
-async def test_read_stream_max_count(eventstoredb_client: Client, stream_name):
+async def test_read_stream_max_count(
+    eventstoredb_client: Client,
+    stream_name: str,
+) -> None:
     await eventstoredb_client.append_to_stream(
         stream_name=stream_name,
         events=json_test_events(4),
@@ -164,8 +179,9 @@ async def test_read_stream_max_count(eventstoredb_client: Client, stream_name):
 
 
 async def test_read_stream_max_count_from_revision(
-    eventstoredb_client: Client, stream_name
-):
+    eventstoredb_client: Client,
+    stream_name: str,
+) -> None:
     await eventstoredb_client.append_to_stream(
         stream_name=stream_name,
         events=json_test_events(4),
@@ -183,8 +199,11 @@ async def test_read_stream_max_count_from_revision(
 
 
 # NOTE this test currently creates a "task was destroyed"-error
-# this should most likely be resolved with: https://github.com/pytest-dev/pytest-asyncio/issues/235
-async def test_read_stream_stream_not_exist(eventstoredb_client: Client, stream_name):
+# see: https://github.com/pytest-dev/pytest-asyncio/issues/235
+async def test_read_stream_stream_not_exist(
+    eventstoredb_client: Client,
+    stream_name: str,
+) -> None:
     it = eventstoredb_client.read_stream(stream_name=stream_name)
 
     with pytest.raises(StreamNotFoundError) as execinfo:
@@ -194,5 +213,5 @@ async def test_read_stream_stream_not_exist(eventstoredb_client: Client, stream_
 
 
 @pytest.mark.skip(reason="test not implemented")
-async def test_read_stream_stream_deleted():
+async def test_read_stream_stream_deleted() -> None:
     pass

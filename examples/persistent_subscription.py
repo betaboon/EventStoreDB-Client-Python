@@ -2,26 +2,29 @@ import asyncio
 import logging
 
 from eventstoredb import Client, ClientOptions
-from eventstoredb.generated.event_store.client.persistent_subscriptions import UpdateReq
+
+# from eventstoredb.generated.event_store.client.persistent_subscriptions import (
+#     UpdateReq
+# )
 from eventstoredb.persistent_subscriptions.common.exceptions import (
     PersistentSubscriptionError,
 )
-from eventstoredb.persistent_subscriptions.common.types import (
-    PersistentSubscriptionSettings,
-)
-from eventstoredb.persistent_subscriptions.subscribe.subscription import (
-    PersistentSubscription,
-)
-from eventstoredb.persistent_subscriptions.subscribe.types import NackAction
-from eventstoredb.persistent_subscriptions.update.types import (
-    UpdatePersistentSubscriptionOptions,
-)
-from tests.test_subscribe_to_stream import subscriber
+
+# from eventstoredb.persistent_subscriptions.common.types import (
+#     PersistentSubscriptionSettings,
+# )
+# from eventstoredb.persistent_subscriptions.subscribe.subscription import (
+#     PersistentSubscription,
+# )
+# from eventstoredb.persistent_subscriptions.subscribe.types import NackAction
+# from eventstoredb.persistent_subscriptions.update.types import (
+#     UpdatePersistentSubscriptionOptions,
+# )
 
 logging.basicConfig(level=logging.WARN)
 
 
-async def main():
+async def main() -> None:
     options = ClientOptions(host="localhost", port=2113)
     client = Client(options)
     stream_name = "foobar-345"
@@ -59,7 +62,7 @@ async def main():
         # await subscription.ack(e)
 
 
-def sync_main():
+def sync_main() -> None:
     asyncio.run(main())
 
 

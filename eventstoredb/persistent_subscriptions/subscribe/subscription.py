@@ -1,13 +1,14 @@
+from __future__ import annotations
+
 import asyncio
 import logging
-from typing import AsyncIterable, AsyncIterator, List, Optional, Union
+from typing import AsyncIterator
 
 from grpclib.exceptions import GRPCError
 
 from eventstoredb.generated.event_store.client.persistent_subscriptions import (
     PersistentSubscriptionsStub,
     ReadReq,
-    ReadResp,
 )
 from eventstoredb.persistent_subscriptions.common.grpc import (
     convert_grpc_error_to_exception,
@@ -40,11 +41,10 @@ class PersistentSubscription(AsyncIterator[PersistentSubscriptionEvent]):
         client: PersistentSubscriptionsStub,
         stream_name: str,
         group_name: str,
-        options: Optional[SubscribeToPersistentSubscriptionOptions] = None,
+        options: SubscribeToPersistentSubscriptionOptions | None = None,
     ) -> None:
         self.stream_name = stream_name
         self.group_name = group_name
-        self.id = Optional[str]
         self._request_queue = RequestQueue()
 
         self._request_queue.put_nowait(
@@ -74,7 +74,7 @@ class PersistentSubscription(AsyncIterator[PersistentSubscriptionEvent]):
 
     async def ack(
         self,
-        events: Union[List[PersistentSubscriptionEvent], PersistentSubscriptionEvent],
+        events: PersistentSubscriptionEvent | list[PersistentSubscriptionEvent],
     ) -> None:
         request = create_ack_request(events=events)
         await self._request_queue.put(request)
@@ -83,7 +83,7 @@ class PersistentSubscription(AsyncIterator[PersistentSubscriptionEvent]):
         self,
         action: NackAction,
         reason: str,
-        events: Union[List[PersistentSubscriptionEvent], PersistentSubscriptionEvent],
-    ):
+        events: PersistentSubscriptionEvent | list[PersistentSubscriptionEvent],
+    ) -> None:
         request = create_nack_request(action=action, reason=reason, events=events)
         await self._request_queue.put(request)

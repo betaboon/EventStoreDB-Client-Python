@@ -1,4 +1,4 @@
-from typing import Union
+from __future__ import annotations
 
 from eventstoredb.streams.append.types import AppendExpectedRevision
 
@@ -11,13 +11,17 @@ class WrongExpectedRevisionError(AppendToStreamError):
     def __init__(
         self,
         stream_name: str,
-        expected_revision: Union[AppendExpectedRevision, int],
-        current_revision: Union[None, int],
+        expected_revision: int | AppendExpectedRevision,
+        current_revision: int | None,
     ):
         self.stream_name = stream_name
         self.expected_revision = expected_revision
         self.current_revision = current_revision
-        message = f"Wrong revision. expected: {self.expected_revision} got: {self.current_revision}"
+        message = (
+            f"Wrong revision. "
+            f"expected: {self.expected_revision} "
+            f"got: {self.current_revision}"
+        )
         super().__init__(message)
 
 

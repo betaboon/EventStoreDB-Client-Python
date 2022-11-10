@@ -1,4 +1,6 @@
-from typing import AsyncIterator, Optional
+from __future__ import annotations
+
+from typing import AsyncIterator
 from uuid import UUID
 
 from eventstoredb.events import ReadEvent
@@ -10,7 +12,7 @@ from eventstoredb.streams.subscribe.types import SubscriptionConfirmation
 class Subscription(AsyncIterator[ReadEvent]):
     def __init__(self, it: AsyncIterator[ReadResp]) -> None:
         self._it = it
-        self.id: Optional[UUID]
+        self.id: UUID | None
 
     def __aiter__(self) -> AsyncIterator[ReadEvent]:
         return self

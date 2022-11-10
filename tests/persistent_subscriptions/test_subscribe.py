@@ -1,6 +1,8 @@
 import asyncio
+from typing import AsyncGenerator
 
 import pytest
+import pytest_asyncio
 from pytest_mock import MockerFixture
 
 from eventstoredb import Client
@@ -14,11 +16,11 @@ from eventstoredb.streams.types import StreamPosition
 
 from ..utils import PersistentSubscriber, json_test_events
 
-pytestmark = pytest.mark.asyncio
 
-
-@pytest.fixture
-async def subscriber(event_loop):
+@pytest_asyncio.fixture
+async def subscriber(
+    event_loop: asyncio.AbstractEventLoop,
+) -> AsyncGenerator[PersistentSubscriber, None]:
     s = PersistentSubscriber(event_loop)
     yield s
     await s._stop()
@@ -30,7 +32,7 @@ async def test_subscribe_persistent_subscription_from_start(
     group_name: str,
     subscriber: PersistentSubscriber,
     mocker: MockerFixture,
-):
+) -> None:
     await eventstoredb_client.append_to_stream(
         stream_name=stream_name,
         events=json_test_events(10),
@@ -68,20 +70,20 @@ async def test_subscribe_persistent_subscription_from_start(
 
 
 @pytest.mark.skip(reason="test not implemented")
-async def test_subscribe_persistent_subscription_from_end():
+async def test_subscribe_persistent_subscription_from_end() -> None:
     pass
 
 
 @pytest.mark.skip(reason="test not implemented")
-async def test_subscribe_persistent_subscription_from_revision():
+async def test_subscribe_persistent_subscription_from_revision() -> None:
     pass
 
 
 @pytest.mark.skip(reason="test not implemented")
-async def test_subscribe_persistent_subscription_nack():
+async def test_subscribe_persistent_subscription_nack() -> None:
     pass
 
 
 @pytest.mark.skip(reason="test not implemented")
-async def test_subscribe_persistent_subscription_raises_if_not_exist():
+async def test_subscribe_persistent_subscription_raises_if_not_exist() -> None:
     pass

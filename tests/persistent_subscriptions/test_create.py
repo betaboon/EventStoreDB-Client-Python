@@ -11,15 +11,13 @@ from eventstoredb.streams.types import StreamPosition
 
 from ..utils import EventstoreHTTP
 
-pytestmark = pytest.mark.asyncio
-
 
 async def test_create_persistent_subscription(
     eventstoredb_client: Client,
     eventstoredb_httpclient: EventstoreHTTP,
     stream_name: str,
     group_name: str,
-):
+) -> None:
     await eventstoredb_client.create_persistent_subscription(
         stream_name=stream_name,
         group_name=group_name,
@@ -39,7 +37,7 @@ async def test_create_persistent_subscription_defaults(
     eventstoredb_httpclient: EventstoreHTTP,
     stream_name: str,
     group_name: str,
-):
+) -> None:
 
     options = CreatePersistentSubscriptionOptions()
     await eventstoredb_client.create_persistent_subscription(
@@ -73,7 +71,7 @@ async def test_create_persistent_subscription_from_start(
     eventstoredb_httpclient: EventstoreHTTP,
     stream_name: str,
     group_name: str,
-):
+) -> None:
     await eventstoredb_client.create_persistent_subscription(
         stream_name=stream_name,
         group_name=group_name,
@@ -92,7 +90,7 @@ async def test_create_persistent_subscription_from_end(
     eventstoredb_httpclient: EventstoreHTTP,
     stream_name: str,
     group_name: str,
-):
+) -> None:
     await eventstoredb_client.create_persistent_subscription(
         stream_name=stream_name,
         group_name=group_name,
@@ -111,7 +109,7 @@ async def test_create_persistent_subscription_from_revision(
     eventstoredb_httpclient: EventstoreHTTP,
     stream_name: str,
     group_name: str,
-):
+) -> None:
     await eventstoredb_client.create_persistent_subscription(
         stream_name=stream_name,
         group_name=group_name,
@@ -128,7 +126,7 @@ async def test_create_persistent_subscription_raises_if_exists(
     eventstoredb_client: Client,
     stream_name: str,
     group_name: str,
-):
+) -> None:
 
     await eventstoredb_client.create_persistent_subscription(
         stream_name=stream_name,

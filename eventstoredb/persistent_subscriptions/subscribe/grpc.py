@@ -1,10 +1,11 @@
+from __future__ import annotations
+
 import json
-from typing import List, Optional, Union
 from uuid import UUID
 
 import betterproto
 
-from eventstoredb.events import (
+from eventstoredb.events import (  # noqa: F401
     BinaryRecordedEvent,
     ContentType,
     JsonRecordedEvent,
@@ -35,7 +36,7 @@ from eventstoredb.persistent_subscriptions.subscribe.types import (
 def create_read_request(
     stream_name: str,
     group_name: str,
-    options: Optional[SubscribeToPersistentSubscriptionOptions] = None,
+    options: SubscribeToPersistentSubscriptionOptions | None = None,
 ) -> ReadReq:
     if options is None:
         options = SubscribeToPersistentSubscriptionOptions()
@@ -50,9 +51,9 @@ def create_read_request(
 
 
 def create_ack_request(
-    events: Union[List[PersistentSubscriptionEvent], PersistentSubscriptionEvent]
+    events: PersistentSubscriptionEvent | list[PersistentSubscriptionEvent],
 ) -> ReadReq:
-    if not isinstance(events, List):
+    if not isinstance(events, list):
         events = [events]
 
     ack = ReadReqAck()
@@ -64,9 +65,9 @@ def create_ack_request(
 def create_nack_request(
     action: NackAction,
     reason: str,
-    events: Union[List[PersistentSubscriptionEvent], PersistentSubscriptionEvent],
+    events: PersistentSubscriptionEvent | list[PersistentSubscriptionEvent],
 ) -> ReadReq:
-    if not isinstance(events, List):
+    if not isinstance(events, list):
         events = [events]
 
     nack = ReadReqNack()
@@ -90,7 +91,7 @@ def create_nack_request(
 
 def convert_read_response(
     message: ReadResp,
-) -> Union[PersistentSubscriptionConfirmation, PersistentSubscriptionEvent]:
+) -> PersistentSubscriptionConfirmation | PersistentSubscriptionEvent:
     content_type, _ = betterproto.which_one_of(message, "content")
     if content_type == "event":
         return convert_read_response_event(message.event)
@@ -118,7 +119,7 @@ def convert_read_response_event(
 
 def convert_read_response_recorded_event(
     message: ReadRespReadEventRecordedEvent,
-) -> Union[JsonRecordedEvent, BinaryRecordedEvent]:
+) -> JsonRecordedEvent | BinaryRecordedEvent:
     stream_name = message.stream_identifier.stream_name.decode()
     id = UUID(message.id.string)
     content_type = ContentType(message.metadata["content-type"])

@@ -1,4 +1,4 @@
-from typing import Optional
+from __future__ import annotations
 
 import betterproto
 
@@ -28,7 +28,7 @@ from eventstoredb.streams.types import StreamRevision
 
 def create_append_header(
     stream_name: str,
-    options: Optional[AppendToStreamOptions] = None,
+    options: AppendToStreamOptions | None = None,
 ) -> AppendReq:
     if options is None:
         options = AppendToStreamOptions()

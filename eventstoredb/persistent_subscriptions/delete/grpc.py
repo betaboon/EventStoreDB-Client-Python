@@ -1,4 +1,4 @@
-from typing import Optional
+from __future__ import annotations
 
 from eventstoredb.generated.event_store.client import StreamIdentifier
 from eventstoredb.generated.event_store.client.persistent_subscriptions import (
@@ -12,7 +12,7 @@ from eventstoredb.persistent_subscriptions.delete.types import (
 def create_delete_request_options(
     stream_name: str,
     group_name: str,
-    options: Optional[DeletePersistentSubscriptionOptions] = None,
+    options: DeletePersistentSubscriptionOptions | None = None,
 ):
     if options is None:
         options = DeletePersistentSubscriptionOptions()

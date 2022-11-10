@@ -1,4 +1,4 @@
-from typing import Optional
+from __future__ import annotations
 
 from eventstoredb.generated.event_store.client.persistent_subscriptions import (
     CreateReqOptions,
@@ -14,7 +14,7 @@ from eventstoredb.persistent_subscriptions.create.types import (
 def create_create_request_options(
     stream_name: str,
     group_name: str,
-    options: Optional[CreatePersistentSubscriptionOptions],
+    options: CreatePersistentSubscriptionOptions | None = None,
 ) -> CreateReqOptions:
     if options is None:
         options = CreatePersistentSubscriptionOptions()

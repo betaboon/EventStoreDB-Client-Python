@@ -6,7 +6,7 @@ from eventstoredb import Client, ClientOptions
 logging.basicConfig(level=logging.WARN)
 
 
-async def main():
+async def main() -> None:
     options = ClientOptions(host="localhost", port=2113)
     client = Client(options)
     stream_name = "example-stream"
@@ -18,7 +18,7 @@ async def main():
     )
 
 
-def sync_main():
+def sync_main() -> None:
     asyncio.run(main())
 
 

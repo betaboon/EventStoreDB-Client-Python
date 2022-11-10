@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from typing import Dict, List
 
 import betterproto
-from betterproto.grpc.grpclib_server import ServiceBase
 import grpclib
+from betterproto.grpc.grpclib_server import ServiceBase
 
 
 class MemberInfoVNodeState(betterproto.Enum):

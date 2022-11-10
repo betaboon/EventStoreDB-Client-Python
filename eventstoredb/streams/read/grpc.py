@@ -1,5 +1,6 @@
+from __future__ import annotations
+
 import json
-from typing import Optional, Union
 from uuid import UUID
 
 import betterproto
@@ -28,7 +29,7 @@ from eventstoredb.streams.types import StreamPosition, StreamRevision
 
 def create_read_request_options(
     stream_name: str,
-    options: Optional[ReadStreamOptions] = None,
+    options: ReadStreamOptions | None = None,
 ) -> ReadReqOptions:
     if options is None:
         options = ReadStreamOptions()
@@ -84,7 +85,7 @@ def convert_read_response_read_event(message: ReadRespReadEvent) -> ReadEvent:
 
 def convert_read_response_recorded_event(
     message: ReadRespReadEventRecordedEvent,
-) -> Union[JsonRecordedEvent, BinaryRecordedEvent]:
+) -> JsonRecordedEvent | BinaryRecordedEvent:
     stream_name = message.stream_identifier.stream_name.decode()
     id = UUID(message.id.string)
     content_type = ContentType(message.metadata["content-type"])

@@ -115,10 +115,9 @@ extend-ignore = [
 per-file-ignores = [
   # imported but unused
   "__init__.py:F401",
-  # comparison to True should be 'if cond is True:' or 'if cond:'
-  "tests/*:E712",
 ]
 exclude = [
+  "eventstoredb/generated/*",
   "__pypackages__",
   "build",
   "dist",
@@ -130,7 +129,7 @@ atomic = true
 filter_files = true
 
 [tool.pytest.ini_options]
-addopts = "-ra --ignore=__pypackages__"
+addopts = "-ra --ignore=__pypackages__ --asyncio-mode=auto"
 
 [build-system]
 requires = ["pdm-pep517>=1.0.0"]

@@ -1,4 +1,5 @@
-from typing import Optional, Union
+from __future__ import annotations
+
 from uuid import UUID
 
 import betterproto
@@ -23,7 +24,7 @@ from eventstoredb.streams.types import StreamPosition, StreamRevision
 
 def create_stream_subscription_options(
     stream_name: str,
-    options: Optional[SubscribeToStreamOptions] = None,
+    options: SubscribeToStreamOptions | None = None,
 ) -> ReadReqOptions:
     if options is None:
         options = SubscribeToStreamOptions()
@@ -49,7 +50,7 @@ def create_stream_subscription_options(
 
 def convert_read_response(
     message: ReadResp,
-) -> Union[SubscriptionConfirmation, ReadEvent]:
+) -> SubscriptionConfirmation | ReadEvent:
     content_type, _ = betterproto.which_one_of(message, "content")
     if content_type == "event":
         return convert_read_response_read_event(message.event)
