@@ -1,0 +1,24 @@
+default_install_hook_types:
+  - pre-commit
+  - commit-msg
+repos:
+  - repo: https://github.com/psf/black
+    rev: 22.6.0
+    hooks:
+      - id: black
+  - repo: https://github.com/john-hen/Flake8-pyproject
+    rev: 1.0.0
+    hooks:
+      - id: Flake8-pyproject
+  - repo: https://github.com/pycqa/isort
+    rev: 5.10.1
+    hooks:
+      - id: isort
+  - repo: https://github.com/jorisroovers/gitlint
+    rev: v0.17.0
+    hooks:
+      - id: gitlint
+        args:
+          - --contrib=contrib-title-conventional-commits
+          - --ignore=body-is-missing
+          - --msg-filename

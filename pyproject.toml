@@ -1,57 +1,137 @@
-[tool.poetry]
+[project]
+license = {text = "Apache-2.0"}
+authors = [
+    {name = "betaboon", email = "betaboon@0x80.ninja"},
+]
 name = "eventstoredb"
-version = "0.1.1"
-description = ""
-authors = ["betaboon <betaboon@0x80.ninja>"]
+description = "Python EventstoreDB client that uses gRPBC as the communication protocol."
+readme = "README.md"
+keywords = ["eventstore", "eventstoredb"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+]
+dynamic = ["version"]
+requires-python = ">=3.9"
+dependencies = [
+    "betterproto==2.0.0b5",
+]
 
-[tool.poetry.dependencies]
-python = "^3.9"
-betterproto = "2.0.0b4"
+[project.urls]
+repository = "https://github.com/betaboon/EventStoreDB-Client-Python"
+changelog = "https://github.com/betaboon/EventStoreDB-Client-Python/releases"
 
-[tool.poetry.dev-dependencies]
-pytest = "^7.1.2"
-pytest-docker = "^0.12.0"
-pytest-asyncio = "^0.18.3"
-pytest-mock = "^3.8.2"
-betterproto = {version = "2.0.0b4", extras = ["compiler"]}
-grpcio-tools = "^1.47.0"
-taskipy = "^1.10.2"
-poetryup = "^0.9.0"
+[project.optional-dependencies]
+[tool.pdm.dev-dependencies]
+test = [
+    "pytest>=7.2.0",
+    "pytest-docker>=1.0.1",
+    "pytest-asyncio>=0.20.1",
+    "pytest-mock>=3.10.0",
+]
+dev = [
+    "grpcio-tools>=1.50.0",
+    "betterproto[compiler]==2.0.0b5",
+    "pre-commit>=2.20.0",
+    "gitlint>=0.17.0",
+    "python-semantic-release>=7.32.2",
+]
 
-[tool.pytest.ini_options]
-log_cli = true
+[tool.pdm.scripts]
+install-git-hooks = "pre-commit install --install-hooks"
+lint = "pre-commit run --all-files"
+test = "pytest"
 
-[tool.taskipy.tasks.test]
-help = "run tests"
-cmd = "pytest"
+[tool.pdm.scripts._.env]
+EVENTSTOREDB_VERSION = "oss-v21.10.8"
+PROTOC_IN_PATH = "./external/EventStore/src/Protos/Grpc"
+PROTOC_OUT_PATH = "./eventstoredb/generated"
 
-[tool.taskipy.variables]
-protoc_in_path = "./external/EventStore/src/Protos/Grpc"
-protoc_out_path = "./eventstoredb/generated"
-
-[tool.taskipy.tasks.protobuf-generate]
-use_vars = true
-help = "generate grpc-code from protobuf-definitions"
-cmd = """
-  mkdir -p {protoc_out_path} &&
+[tool.pdm.scripts.protobuf-generate]
+shell = """
+  mkdir -p ${PROTOC_OUT_PATH} &&
   python -m grpc_tools.protoc \
-    --proto_path={protoc_in_path} \
-    --python_betterproto_out={protoc_out_path} \
-    {protoc_in_path}/*.proto
+    --proto_path=${PROTOC_IN_PATH} \
+    --python_betterproto_out=${PROTOC_OUT_PATH} \
+    ${PROTOC_IN_PATH}/*.proto
 """
 
-[tool.taskipy.tasks.protobuf-update]
-use_vars = true
-help = "update EventStore-submodule to version provided in env VERSION"
-cmd = """
-[ -z "$VERSION" ] && echo "environment-variable VERSION not provided" || \
+[tool.pdm.scripts.protobuf-update]
+shell = """
+[ -z "$EVENTSTOREDB_VERSION" ] && echo "env EVENTSTOREDB_VERSION not set" || \
 (
-  cd {protoc_in_path} && \
-  git fetch --depth 1 origin $VERSION && \
+  cd ${PROTOC_IN_PATH} && \
+  git fetch --depth 1 origin ${EVENTSTOREDB_VERSION} && \
   git checkout FETCH_HEAD
 )
 """
 
+[tool.pdm.scripts.ci-lint]
+cmd = [
+  "pre-commit", "run",
+  "--show-diff-on-failure",
+  "--from-ref", "$FROM_REF",
+  "--to-ref", "$TO_REF",
+]
+
+[tool.pdm.scripts.ci-commit-lint]
+cmd = [
+  "gitlint",
+  "--contrib", "contrib-title-conventional-commits",
+  "--ignore", "body-is-missing",
+  "--commits", "$FROM_REF..$TO_REF",
+]
+
+[tool.pdm.scripts.ci-version]
+cmd = "semantic-release print-version --next"
+
+[tool.pdm.scripts.ci-changelog]
+cmd = "semantic-release changelog --unreleased"
+
+[tool.pdm.version]
+source = "scm"
+write_to = "eventstoredb/__version__.py"
+write_template = "__version__ = '{}'"
+
+[tool.semantic_release]
+branch = "main"
+version_source = "tag_only"
+version_pattern = "d+.d+.d+"
+tag_format = "{version}"
+
+[tool.black]
+line-length = 88
+
+[tool.flake8]
+# Recommend matching the black line length (default 88),
+# rather than using the flake8 default of 79:
+max-line-length = 88
+extend-ignore = [
+    # See https://github.com/PyCQA/pycodestyle/issues/373
+    "E203",
+]
+per-file-ignores = [
+  # imported but unused
+  "__init__.py:F401",
+  # comparison to True should be 'if cond is True:' or 'if cond:'
+  "tests/*:E712",
+]
+exclude = [
+  "__pypackages__",
+  "build",
+  "dist",
+]
+
+[tool.isort]
+profile = "black"
+atomic = true
+filter_files = true
+
+[tool.pytest.ini_options]
+addopts = "-ra --ignore=__pypackages__"
+
 [build-system]
-requires = ["poetry-core>=1.0.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["pdm-pep517>=1.0.0"]
+build-backend = "pdm.pep517.api"
