@@ -1,15 +1,14 @@
 import asyncio
 import logging
 
-from eventstoredb.client.client import Client, ClientOptions
+from eventstoredb.client.client import Client
 from eventstoredb.events import JsonEvent
 
 logging.basicConfig(level=logging.WARN)
 
 
 async def main() -> None:
-    settings = ClientOptions(host="localhost", port=2113)
-    client = Client(settings)
+    client = Client("esdb://localhost:2113")
     stream_name = "example-stream"
     result = await client.append_to_stream(
         stream_name=stream_name,

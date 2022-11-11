@@ -17,6 +17,7 @@ dynamic = ["version"]
 requires-python = ">=3.9"
 dependencies = [
     "betterproto==2.0.0b5",
+    "yarl>=1.8.1",
 ]
 
 [project.urls]
