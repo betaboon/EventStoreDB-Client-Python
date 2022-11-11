@@ -1,8 +1,8 @@
+from __future__ import annotations
+
 from dataclasses import dataclass
-from typing import Optional
 from enum import Enum, auto
 from uuid import UUID
-
 
 from eventstoredb.events import ReadEvent
 
@@ -14,7 +14,7 @@ class SubscribeToPersistentSubscriptionOptions:
 
 @dataclass
 class PersistentSubscriptionEvent(ReadEvent):
-    retry_count: Optional[int] = None
+    retry_count: int | None = None
 
     @property
     def original_id(self) -> UUID:

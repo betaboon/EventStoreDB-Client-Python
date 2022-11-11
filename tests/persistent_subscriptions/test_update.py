@@ -11,9 +11,8 @@ from eventstoredb.persistent_subscriptions.update.types import (
     UpdatePersistentSubscriptionOptions,
 )
 from eventstoredb.streams.types import StreamPosition
-from ..utils import EventstoreHTTP
 
-pytestmark = pytest.mark.asyncio
+from ..utils import EventstoreHTTP
 
 
 async def test_update_persistent_subscription(
@@ -21,7 +20,7 @@ async def test_update_persistent_subscription(
     eventstoredb_httpclient: EventstoreHTTP,
     stream_name: str,
     group_name: str,
-):
+) -> None:
     await eventstoredb_client.create_persistent_subscription(
         stream_name=stream_name,
         group_name=group_name,
@@ -50,7 +49,7 @@ async def test_update_persistent_subscription_raises_if_not_exists(
     eventstoredb_client: Client,
     stream_name: str,
     group_name: str,
-):
+) -> None:
     with pytest.raises(PersistentSubscriptionDoesNotExistError):
         await eventstoredb_client.update_persistent_subscription(
             stream_name=stream_name,

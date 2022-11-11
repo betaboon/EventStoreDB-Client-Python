@@ -6,8 +6,8 @@ from datetime import datetime
 from typing import AsyncIterable, AsyncIterator, Dict, Iterable, List, Union
 
 import betterproto
-from betterproto.grpc.grpclib_server import ServiceBase
 import grpclib
+from betterproto.grpc.grpclib_server import ServiceBase
 
 
 class ReadReqOptionsReadDirection(betterproto.Enum):
@@ -559,6 +559,7 @@ class StreamsBase(ServiceBase):
         }
 
 
-from ... import client as __client__
-from ....google import rpc as ___google_rpc__
 import betterproto.lib.google.protobuf as betterproto_lib_google_protobuf
+
+from ....google import rpc as ___google_rpc__
+from ... import client as __client__

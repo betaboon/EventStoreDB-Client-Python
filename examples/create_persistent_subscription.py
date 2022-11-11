@@ -1,17 +1,15 @@
 import asyncio
 import logging
 
-
 from eventstoredb import Client, ClientOptions
 from eventstoredb.persistent_subscriptions.create.types import (
     CreatePersistentSubscriptionOptions,
 )
-from eventstoredb.streams.types import StreamPosition
 
 logging.basicConfig(level=logging.WARN)
 
 
-async def main():
+async def main() -> None:
     options = ClientOptions(host="localhost", port=2113)
     client = Client(options)
     stream_name = "example-stream"
@@ -24,7 +22,7 @@ async def main():
     )
 
 
-def sync_main():
+def sync_main() -> None:
     asyncio.run(main())
 
 

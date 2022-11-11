@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from typing import Dict
 
 import betterproto
-from betterproto.grpc.grpclib_server import ServiceBase
 import grpclib
+from betterproto.grpc.grpclib_server import ServiceBase
 
 
 class ScavengeRespScavengeResult(betterproto.Enum):

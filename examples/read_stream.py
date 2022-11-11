@@ -2,12 +2,11 @@ import asyncio
 import logging
 
 from eventstoredb.client.client import Client, ClientOptions
-from eventstoredb.client.options import ReadStreamOptions
 
 logging.basicConfig(level=logging.WARN)
 
 
-async def main():
+async def main() -> None:
     options = ClientOptions(host="localhost", port=2113)
     client = Client(options)
     stream_name = "foobar-345"
@@ -18,7 +17,7 @@ async def main():
         print(e)
 
 
-def sync_main():
+def sync_main() -> None:
     asyncio.run(main())
 
 

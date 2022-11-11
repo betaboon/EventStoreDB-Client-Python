@@ -6,8 +6,8 @@ from dataclasses import dataclass
 from typing import AsyncIterable, AsyncIterator, Dict, Iterable, List, Union
 
 import betterproto
-from betterproto.grpc.grpclib_server import ServiceBase
 import grpclib
+from betterproto.grpc.grpclib_server import ServiceBase
 
 
 class ReadReqNackAction(betterproto.Enum):

@@ -1,12 +1,9 @@
 from typing import TypeVar
 
-from grpclib.exceptions import GRPCError
 from grpclib.const import Status as GRPCStatus
+from grpclib.exceptions import GRPCError
 
-from eventstoredb.generated.event_store.client import (
-    Empty,
-    StreamIdentifier,
-)
+from eventstoredb.generated.event_store.client import Empty, StreamIdentifier
 from eventstoredb.generated.event_store.client.persistent_subscriptions import (
     CreateReqConsumerStrategy,
     CreateReqOptions,
@@ -17,13 +14,7 @@ from eventstoredb.generated.event_store.client.persistent_subscriptions import (
     UpdateReqSettings,
     UpdateReqStreamOptions,
 )
-
-from eventstoredb.streams.types import StreamPosition, StreamRevision
-from eventstoredb.persistent_subscriptions.common.types import (
-    ConsumerStrategy,
-    CreateUpdatePersistentSubscriptionOptions,
-)
-from eventstoredb.persistent_subscriptions.common.exceptions import (
+from eventstoredb.persistent_subscriptions.common.exceptions import (  # noqa: F401
     PersistentSubscriptionDoesNotExistError,
     PersistentSubscriptionDroppedError,
     PersistentSubscriptionError,
@@ -31,6 +22,11 @@ from eventstoredb.persistent_subscriptions.common.exceptions import (
     PersistentSubscriptionFailedError,
     PersistentSubscriptionMaxSubscribersReachedError,
 )
+from eventstoredb.persistent_subscriptions.common.types import (
+    ConsumerStrategy,
+    CreateUpdatePersistentSubscriptionOptions,
+)
+from eventstoredb.streams.types import StreamPosition, StreamRevision
 
 Options = TypeVar("Options", CreateReqOptions, UpdateReqOptions)
 
@@ -75,16 +71,16 @@ def create_create_update_request_options(
     settings.checkpoint_after_ms = options.settings.checkpoint_after
 
     if options.settings.consumer_strategy == ConsumerStrategy.DISPATCH_TO_SINGLE:
-        settings.named_consumer_strategy = consumer_strategy_class.DispatchToSingle  # type: ignore
+        settings.named_consumer_strategy = consumer_strategy_class.DispatchToSingle
     elif options.settings.consumer_strategy == ConsumerStrategy.ROUND_ROBIN:
-        settings.named_consumer_strategy = consumer_strategy_class.RoundRobin  # type: ignore
+        settings.named_consumer_strategy = consumer_strategy_class.RoundRobin
     elif options.settings.consumer_strategy == ConsumerStrategy.PINNED:
-        settings.named_consumer_strategy = consumer_strategy_class.Pinned  # type: ignore
+        settings.named_consumer_strategy = consumer_strategy_class.Pinned
 
     return request_options
 
 
-def convert_grpc_error_to_exception(error: GRPCError):
+def convert_grpc_error_to_exception(error: GRPCError) -> PersistentSubscriptionError:
     if error.status == GRPCStatus.CANCELLED:
         return PersistentSubscriptionDroppedError(error.message)
     elif error.status == GRPCStatus.NOT_FOUND:

@@ -1,78 +1,80 @@
-from typing import Union, Optional, Iterable, AsyncIterator
+from __future__ import annotations
+
+from typing import AsyncGenerator, AsyncIterator, Iterable
 
 from grpclib.client import Channel
 from grpclib.exceptions import GRPCError
 
-from eventstoredb.generated.event_store.client.streams import StreamsStub
+from eventstoredb.client.types import ClientOptions
+from eventstoredb.events import EventData, ReadEvent
 from eventstoredb.generated.event_store.client.persistent_subscriptions import (
     PersistentSubscriptionsStub,
 )
-
-
-from eventstoredb.client.types import ClientOptions
-from eventstoredb.events import (
-    EventData,
-    ReadEvent,
-)
-from eventstoredb.streams.append import (
-    create_append_header,
-    create_append_request,
-    convert_append_response,
-    AppendResult,
-    AppendToStreamOptions,
-)
-from eventstoredb.streams.read import (
-    create_read_request_options,
-    convert_read_response,
-    ReadStreamOptions,
-)
-from eventstoredb.streams.subscribe import (
-    create_stream_subscription_options,
-    Subscription,
-    SubscribeToStreamOptions,
-)
-from eventstoredb.persistent_subscriptions.common import (
-    convert_grpc_error_to_exception,
-)
+from eventstoredb.generated.event_store.client.streams import StreamsStub
+from eventstoredb.persistent_subscriptions.common import convert_grpc_error_to_exception
 from eventstoredb.persistent_subscriptions.create import (
-    create_create_request_options,
     CreatePersistentSubscriptionOptions,
-)
-from eventstoredb.persistent_subscriptions.update import (
-    create_update_request_options,
-    UpdatePersistentSubscriptionOptions,
+    create_create_request_options,
 )
 from eventstoredb.persistent_subscriptions.delete import (
-    create_delete_request_options,
     DeletePersistentSubscriptionOptions,
+    create_delete_request_options,
 )
 from eventstoredb.persistent_subscriptions.subscribe import (
     PersistentSubscription,
     SubscribeToPersistentSubscriptionOptions,
 )
+from eventstoredb.persistent_subscriptions.update import (
+    UpdatePersistentSubscriptionOptions,
+    create_update_request_options,
+)
+from eventstoredb.streams.append import (
+    AppendReq,
+    AppendResult,
+    AppendToStreamOptions,
+    convert_append_response,
+    create_append_header,
+    create_append_request,
+)
+from eventstoredb.streams.read import (
+    ReadStreamOptions,
+    convert_read_response,
+    create_read_request_options,
+)
+from eventstoredb.streams.subscribe import (
+    SubscribeToStreamOptions,
+    Subscription,
+    create_stream_subscription_options,
+)
 
 
 class Client:
     def __init__(self, options: ClientOptions) -> None:
-        self.channel = Channel(host=options.host, port=options.port)
+        self.options = options
+        self._channel: Channel | None = None
+
+    @property
+    def channel(self) -> Channel:
+        if self._channel is None:
+            self._channel = Channel(host=self.options.host, port=self.options.port)
+        return self._channel
 
     async def append_to_stream(
         self,
         stream_name: str,
-        events: Union[EventData, Iterable[EventData]],
-        options: Optional[AppendToStreamOptions] = None,
+        events: EventData | Iterable[EventData],
+        options: AppendToStreamOptions | None = None,
     ) -> AppendResult:
-
-        if isinstance(events, EventData):
-            events = [events]
-
-        async def request_iterator():
+        async def request_iterator() -> AsyncGenerator[AppendReq, None]:
             yield create_append_header(
                 stream_name=stream_name,
                 options=options,
             )
-            for event in events:
-                yield create_append_request(event)
+            if isinstance(events, EventData):
+                yield create_append_request(events)
+            else:
+                for event in events:
+                    yield create_append_request(event)
 
         client = StreamsStub(channel=self.channel)
         response = await client.append(request_iterator())
@@ -81,7 +83,7 @@ class Client:
     async def read_stream(
         self,
         stream_name: str,
-        options: Optional[ReadStreamOptions] = None,
+        options: ReadStreamOptions | None = None,
     ) -> AsyncIterator[ReadEvent]:
         client = StreamsStub(channel=self.channel)
         request_options = create_read_request_options(
@@ -93,7 +95,9 @@ class Client:
             yield convert_read_response(response)
 
     def subscribe_to_stream(
-        self, stream_name: str, options: Optional[SubscribeToStreamOptions] = None
+        self,
+        stream_name: str,
+        options: SubscribeToStreamOptions | None = None,
     ) -> Subscription:
         client = StreamsStub(channel=self.channel)
         request_options = create_stream_subscription_options(
@@ -107,7 +111,7 @@ class Client:
         self,
         stream_name: str,
         group_name: str,
-        options: Optional[CreatePersistentSubscriptionOptions] = None,
+        options: CreatePersistentSubscriptionOptions | None = None,
     ) -> None:
         client = PersistentSubscriptionsStub(channel=self.channel)
         request_options = create_create_request_options(
@@ -124,7 +128,7 @@ class Client:
         self,
         stream_name: str,
         group_name: str,
-        options: Optional[UpdatePersistentSubscriptionOptions] = None,
+        options: UpdatePersistentSubscriptionOptions | None = None,
     ) -> None:
         client = PersistentSubscriptionsStub(channel=self.channel)
         request_options = create_update_request_options(
@@ -141,7 +145,7 @@ class Client:
         self,
         stream_name: str,
         group_name: str,
-        options: Optional[DeletePersistentSubscriptionOptions] = None,
+        options: DeletePersistentSubscriptionOptions | None = None,
     ) -> None:
         client = PersistentSubscriptionsStub(channel=self.channel)
         request_options = create_delete_request_options(
@@ -158,7 +162,7 @@ class Client:
         self,
         stream_name: str,
         group_name: str,
-        options: Optional[SubscribeToPersistentSubscriptionOptions] = None,
+        options: SubscribeToPersistentSubscriptionOptions | None = None,
     ) -> PersistentSubscription:
         client = PersistentSubscriptionsStub(channel=self.channel)
         return PersistentSubscription(

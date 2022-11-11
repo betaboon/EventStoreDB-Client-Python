@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from typing import AsyncIterator, Dict
 
 import betterproto
-from betterproto.grpc.grpclib_server import ServiceBase
 import grpclib
+from betterproto.grpc.grpclib_server import ServiceBase
 
 
 @dataclass(eq=False, repr=False)

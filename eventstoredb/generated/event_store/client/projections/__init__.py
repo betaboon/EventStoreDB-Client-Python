@@ -5,8 +5,8 @@ from dataclasses import dataclass
 from typing import AsyncIterator, Dict
 
 import betterproto
-from betterproto.grpc.grpclib_server import ServiceBase
 import grpclib
+from betterproto.grpc.grpclib_server import ServiceBase
 
 
 @dataclass(eq=False, repr=False)
@@ -505,5 +505,6 @@ class ProjectionsBase(ServiceBase):
         }
 
 
-from ... import client as __client__
 import betterproto.lib.google.protobuf as betterproto_lib_google_protobuf
+
+from ... import client as __client__
