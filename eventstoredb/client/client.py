@@ -5,7 +5,7 @@ from typing import AsyncGenerator, AsyncIterator, Iterable
 from grpclib.client import Channel
 from grpclib.exceptions import GRPCError
 
-from eventstoredb.client.types import ClientOptions
+from eventstoredb.client.options import ClientOptions
 from eventstoredb.events import EventData, ReadEvent
 from eventstoredb.generated.event_store.client.persistent_subscriptions import (
     PersistentSubscriptionsStub,
@@ -49,8 +49,11 @@ from eventstoredb.streams.subscribe import (
 
 
 class Client:
-    def __init__(self, options: ClientOptions) -> None:
-        self.options = options
+    def __init__(self, options: ClientOptions | str) -> None:
+        if isinstance(options, str):
+            self.options = ClientOptions.from_connection_string(options)
+        else:
+            self.options = options
         self._channel: Channel | None = None
 
     @property
