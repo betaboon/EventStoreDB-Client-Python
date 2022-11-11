@@ -4,3 +4,5 @@ __pypackages__
 .venv
 .direnv
 .pdm.toml
+dist
+build
