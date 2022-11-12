@@ -72,7 +72,7 @@ async def test_append_to_stream_one_json_with_data(
         stream_name=stream_name,
         events=JsonEvent(
             type="TestEvent",
-            data={"some": "data"},
+            data=json.dumps({"some": "data"}).encode(),
         ),
     )
 
@@ -96,7 +96,7 @@ async def test_append_to_stream_one_json_with_metadata(
         stream_name=stream_name,
         events=JsonEvent(
             type="TestEvent",
-            metadata={"meta": "data"},
+            metadata=json.dumps({"meta": "data"}).encode(),
         ),
     )
 
@@ -120,8 +120,8 @@ async def test_append_to_stream_one_json_with_data_and_metadata(
         stream_name=stream_name,
         events=JsonEvent(
             type="TestEvent",
-            data={"some": "data"},
-            metadata={"meta": "data"},
+            data=json.dumps({"some": "data"}).encode(),
+            metadata=json.dumps({"meta": "data"}).encode(),
         ),
     )
 
