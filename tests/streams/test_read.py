@@ -1,3 +1,4 @@
+import json
 import uuid
 from typing import Any
 
@@ -41,7 +42,7 @@ async def test_read_stream_json(
 ) -> None:
     await eventstoredb_client.append_to_stream(
         stream_name=stream_name,
-        events=[JsonEvent(type="Test", data={"some": "data"})],
+        events=[JsonEvent(type="Test", data=json.dumps({"some": "data"}).encode())],
     )
 
     it = eventstoredb_client.read_stream(
@@ -59,7 +60,7 @@ async def test_read_stream_json(
     assert event.revision == 0
     assert isinstance(event, JsonRecordedEvent)
     assert event.data is not None
-    assert event.data == {"some": "data"}
+    assert event.data == json.dumps({"some": "data"}).encode()
     assert event.metadata is None
 
 

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-import json
+from typing import Type
 from uuid import UUID
 
 import betterproto
@@ -127,24 +127,12 @@ def convert_read_response_recorded_event(
         commit=message.commit_position,
         prepare=message.prepare_position,
     )
-    data = message.data
-    metadata = message.custom_metadata
-    # TODO reduce duplication
+    event_class: Type[JsonRecordedEvent] | Type[BinaryRecordedEvent]
     if content_type == ContentType.JSON:
-        data = json.loads(data.decode()) if data else None
-        metadata = json.loads(metadata.decode()) if metadata else None
-        return JsonRecordedEvent(
-            stream_name=stream_name,
-            id=id,
-            revision=message.stream_revision,
-            type=message.metadata["type"],
-            content_type=content_type,
-            created=int(message.metadata["created"]),
-            position=position,
-            data=data,
-            metadata=metadata,
-        )
-    return BinaryRecordedEvent(
+        event_class = JsonRecordedEvent
+    else:
+        event_class = BinaryRecordedEvent
+    return event_class(
         stream_name=stream_name,
         id=id,
         revision=message.stream_revision,
@@ -152,8 +140,8 @@ def convert_read_response_recorded_event(
         content_type=content_type,
         created=int(message.metadata["created"]),
         position=position,
-        data=data,
-        metadata=metadata,
+        data=message.data if message.data else None,
+        metadata=message.custom_metadata if message.custom_metadata else None,
     )
 
 

@@ -53,12 +53,10 @@ def create_append_request(event_data: EventData) -> AppendReq:
     message.id = Uuid(string=str(event_data.id))
     message.metadata["type"] = event_data.type
     message.metadata["content-type"] = event_data.content_type
-    data = event_data._serialized_data()
-    metadata = event_data._serialized_metadata()
-    if data:
-        message.data = data
-    if metadata:
-        message.custom_metadata = metadata
+    if event_data.data:
+        message.data = event_data.data
+    if event_data.metadata:
+        message.custom_metadata = event_data.metadata
     return AppendReq(proposed_message=message)
 
 
