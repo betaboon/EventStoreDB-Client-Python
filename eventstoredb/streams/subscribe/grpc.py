@@ -7,6 +7,7 @@ import betterproto
 from eventstoredb.events import ReadEvent
 from eventstoredb.generated.event_store.client import Empty, StreamIdentifier
 from eventstoredb.generated.event_store.client.streams import (
+    ReadReq,
     ReadReqOptions,
     ReadReqOptionsStreamOptions,
     ReadReqOptionsSubscriptionOptions,
@@ -22,10 +23,10 @@ from eventstoredb.streams.subscribe.types import (
 from eventstoredb.streams.types import StreamPosition, StreamRevision
 
 
-def create_stream_subscription_options(
+def create_subscribe_request(
     stream_name: str,
     options: SubscribeToStreamOptions | None = None,
-) -> ReadReqOptions:
+) -> ReadReq:
     if options is None:
         options = SubscribeToStreamOptions()
 
@@ -45,7 +46,7 @@ def create_stream_subscription_options(
     elif options.from_revision == StreamPosition.END:
         request_options.stream.end = Empty()
 
-    return request_options
+    return ReadReq(options=request_options)
 
 
 def convert_read_response(

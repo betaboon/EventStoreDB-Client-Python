@@ -2,11 +2,16 @@
 # sources: serverfeatures.proto
 # plugin: python-betterproto
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 import betterproto
 import grpclib
 from betterproto.grpc.grpclib_server import ServiceBase
+
+if TYPE_CHECKING:
+    import grpclib.server
+    from betterproto.grpc.grpclib_client import MetadataLike
+    from grpclib.metadata import Deadline
 
 
 @dataclass(eq=False, repr=False)
@@ -23,27 +28,35 @@ class SupportedMethod(betterproto.Message):
 
 
 class ServerFeaturesStub(betterproto.ServiceStub):
-    async def get_supported_methods(self) -> "SupportedMethods":
-
-        request = __client__.Empty()
-
+    async def get_supported_methods(
+        self,
+        client_empty: "__client__.Empty",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "SupportedMethods":
         return await self._unary_unary(
             "/event_store.client.server_features.ServerFeatures/GetSupportedMethods",
-            request,
+            client_empty,
             SupportedMethods,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
 
 class ServerFeaturesBase(ServiceBase):
-    async def get_supported_methods(self) -> "SupportedMethods":
+    async def get_supported_methods(
+        self, client_empty: "__client__.Empty"
+    ) -> "SupportedMethods":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def __rpc_get_supported_methods(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_get_supported_methods(
+        self, stream: "grpclib.server.Stream[__client__.Empty, SupportedMethods]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {}
-
-        response = await self.get_supported_methods(**request_kwargs)
+        response = await self.get_supported_methods(request)
         await stream.send_message(response)
 
     def __mapping__(self) -> Dict[str, grpclib.const.Handler]:
@@ -55,6 +68,3 @@ class ServerFeaturesBase(ServiceBase):
                 SupportedMethods,
             ),
         }
-
-
-from ... import client as __client__

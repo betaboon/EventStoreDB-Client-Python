@@ -2,11 +2,16 @@
 # sources: monitoring.proto
 # plugin: python-betterproto
 from dataclasses import dataclass
-from typing import AsyncIterator, Dict
+from typing import TYPE_CHECKING, AsyncIterator, Dict, Optional
 
 import betterproto
 import grpclib
 from betterproto.grpc.grpclib_server import ServiceBase
+
+if TYPE_CHECKING:
+    import grpclib.server
+    from betterproto.grpc.grpclib_client import MetadataLike
+    from grpclib.metadata import Deadline
 
 
 @dataclass(eq=False, repr=False)
@@ -24,39 +29,36 @@ class StatsResp(betterproto.Message):
 
 class MonitoringStub(betterproto.ServiceStub):
     async def stats(
-        self, *, use_metadata: bool = False, refresh_time_period_in_ms: int = 0
+        self,
+        stats_req: "StatsReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
     ) -> AsyncIterator["StatsResp"]:
-
-        request = StatsReq()
-        request.use_metadata = use_metadata
-        request.refresh_time_period_in_ms = refresh_time_period_in_ms
-
         async for response in self._unary_stream(
             "/event_store.client.monitoring.Monitoring/Stats",
-            request,
+            stats_req,
             StatsResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         ):
             yield response
 
 
 class MonitoringBase(ServiceBase):
-    async def stats(
-        self, use_metadata: bool, refresh_time_period_in_ms: int
-    ) -> AsyncIterator["StatsResp"]:
+    async def stats(self, stats_req: "StatsReq") -> AsyncIterator["StatsResp"]:
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def __rpc_stats(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_stats(
+        self, stream: "grpclib.server.Stream[StatsReq, StatsResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "use_metadata": request.use_metadata,
-            "refresh_time_period_in_ms": request.refresh_time_period_in_ms,
-        }
-
         await self._call_rpc_handler_server_stream(
             self.stats,
             stream,
-            request_kwargs,
+            request,
         )
 
     def __mapping__(self) -> Dict[str, grpclib.const.Handler]:

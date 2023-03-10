@@ -2,12 +2,30 @@
 # sources: streams.proto
 # plugin: python-betterproto
 from dataclasses import dataclass
-from datetime import datetime
-from typing import AsyncIterable, AsyncIterator, Dict, Iterable, List, Union
+from datetime import datetime, timedelta
+from typing import (
+    TYPE_CHECKING,
+    AsyncIterable,
+    AsyncIterator,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Union,
+)
 
 import betterproto
+import betterproto.lib.google.protobuf as betterproto_lib_google_protobuf
 import grpclib
 from betterproto.grpc.grpclib_server import ServiceBase
+
+from ....google import rpc as ___google_rpc__
+from ... import client as __client__
+
+if TYPE_CHECKING:
+    import grpclib.server
+    from betterproto.grpc.grpclib_client import MetadataLike
+    from grpclib.metadata import Deadline
 
 
 class ReadReqOptionsReadDirection(betterproto.Enum):
@@ -274,7 +292,8 @@ class BatchAppendReqOptions(betterproto.Message):
     stream_exists: "betterproto_lib_google_protobuf.Empty" = betterproto.message_field(
         5, group="expected_stream_position"
     )
-    deadline: datetime = betterproto.message_field(6)
+    deadline_21_10_0: datetime = betterproto.message_field(6, group="deadline_option")
+    deadline: timedelta = betterproto.message_field(7, group="deadline_option")
 
 
 @dataclass(eq=False, repr=False)
@@ -393,135 +412,156 @@ class TombstoneRespPosition(betterproto.Message):
 
 class StreamsStub(betterproto.ServiceStub):
     async def read(
-        self, *, options: "ReadReqOptions" = None
+        self,
+        read_req: "ReadReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
     ) -> AsyncIterator["ReadResp"]:
-
-        request = ReadReq()
-        if options is not None:
-            request.options = options
-
         async for response in self._unary_stream(
             "/event_store.client.streams.Streams/Read",
-            request,
+            read_req,
             ReadResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         ):
             yield response
 
     async def append(
-        self, request_iterator: Union[AsyncIterable["AppendReq"], Iterable["AppendReq"]]
+        self,
+        append_req_iterator: Union[AsyncIterable["AppendReq"], Iterable["AppendReq"]],
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
     ) -> "AppendResp":
-
         return await self._stream_unary(
             "/event_store.client.streams.Streams/Append",
-            request_iterator,
+            append_req_iterator,
             AppendReq,
             AppendResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
-    async def delete(self, *, options: "DeleteReqOptions" = None) -> "DeleteResp":
-
-        request = DeleteReq()
-        if options is not None:
-            request.options = options
-
+    async def delete(
+        self,
+        delete_req: "DeleteReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "DeleteResp":
         return await self._unary_unary(
-            "/event_store.client.streams.Streams/Delete", request, DeleteResp
+            "/event_store.client.streams.Streams/Delete",
+            delete_req,
+            DeleteResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
     async def tombstone(
-        self, *, options: "TombstoneReqOptions" = None
+        self,
+        tombstone_req: "TombstoneReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
     ) -> "TombstoneResp":
-
-        request = TombstoneReq()
-        if options is not None:
-            request.options = options
-
         return await self._unary_unary(
-            "/event_store.client.streams.Streams/Tombstone", request, TombstoneResp
+            "/event_store.client.streams.Streams/Tombstone",
+            tombstone_req,
+            TombstoneResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
     async def batch_append(
         self,
-        request_iterator: Union[
+        batch_append_req_iterator: Union[
             AsyncIterable["BatchAppendReq"], Iterable["BatchAppendReq"]
         ],
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
     ) -> AsyncIterator["BatchAppendResp"]:
-
         async for response in self._stream_stream(
             "/event_store.client.streams.Streams/BatchAppend",
-            request_iterator,
+            batch_append_req_iterator,
             BatchAppendReq,
             BatchAppendResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         ):
             yield response
 
 
 class StreamsBase(ServiceBase):
-    async def read(self, options: "ReadReqOptions") -> AsyncIterator["ReadResp"]:
+    async def read(self, read_req: "ReadReq") -> AsyncIterator["ReadResp"]:
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
     async def append(
-        self, request_iterator: AsyncIterator["AppendReq"]
+        self, append_req_iterator: AsyncIterator["AppendReq"]
     ) -> "AppendResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def delete(self, options: "DeleteReqOptions") -> "DeleteResp":
+    async def delete(self, delete_req: "DeleteReq") -> "DeleteResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def tombstone(self, options: "TombstoneReqOptions") -> "TombstoneResp":
+    async def tombstone(self, tombstone_req: "TombstoneReq") -> "TombstoneResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
     async def batch_append(
-        self, request_iterator: AsyncIterator["BatchAppendReq"]
+        self, batch_append_req_iterator: AsyncIterator["BatchAppendReq"]
     ) -> AsyncIterator["BatchAppendResp"]:
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def __rpc_read(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_read(
+        self, stream: "grpclib.server.Stream[ReadReq, ReadResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
         await self._call_rpc_handler_server_stream(
             self.read,
             stream,
-            request_kwargs,
+            request,
         )
 
-    async def __rpc_append(self, stream: grpclib.server.Stream) -> None:
-        request_kwargs = {"request_iterator": stream.__aiter__()}
-
-        response = await self.append(**request_kwargs)
+    async def __rpc_append(
+        self, stream: "grpclib.server.Stream[AppendReq, AppendResp]"
+    ) -> None:
+        request = stream.__aiter__()
+        response = await self.append(request)
         await stream.send_message(response)
 
-    async def __rpc_delete(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_delete(
+        self, stream: "grpclib.server.Stream[DeleteReq, DeleteResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.delete(**request_kwargs)
+        response = await self.delete(request)
         await stream.send_message(response)
 
-    async def __rpc_tombstone(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_tombstone(
+        self, stream: "grpclib.server.Stream[TombstoneReq, TombstoneResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.tombstone(**request_kwargs)
+        response = await self.tombstone(request)
         await stream.send_message(response)
 
-    async def __rpc_batch_append(self, stream: grpclib.server.Stream) -> None:
-        request_kwargs = {"request_iterator": stream.__aiter__()}
-
+    async def __rpc_batch_append(
+        self, stream: "grpclib.server.Stream[BatchAppendReq, BatchAppendResp]"
+    ) -> None:
+        request = stream.__aiter__()
         await self._call_rpc_handler_server_stream(
             self.batch_append,
             stream,
-            request_kwargs,
+            request,
         )
 
     def __mapping__(self) -> Dict[str, grpclib.const.Handler]:
@@ -557,9 +597,3 @@ class StreamsBase(ServiceBase):
                 BatchAppendResp,
             ),
         }
-
-
-import betterproto.lib.google.protobuf as betterproto_lib_google_protobuf
-
-from ....google import rpc as ___google_rpc__
-from ... import client as __client__

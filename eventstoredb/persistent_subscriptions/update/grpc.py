@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from eventstoredb.generated.event_store.client.persistent_subscriptions import (
+    UpdateReq,
     UpdateReqOptions,
 )
 from eventstoredb.persistent_subscriptions.common.grpc import (
@@ -11,11 +12,11 @@ from eventstoredb.persistent_subscriptions.update.types import (
 )
 
 
-def create_update_request_options(
+def create_update_request(
     stream_name: str,
     group_name: str,
     options: UpdatePersistentSubscriptionOptions | None = None,
-) -> UpdateReqOptions:
+) -> UpdateReq:
     if options is None:
         options = UpdatePersistentSubscriptionOptions()
 
@@ -26,4 +27,4 @@ def create_update_request_options(
         request_options=UpdateReqOptions(),
     )
 
-    return request_options
+    return UpdateReq(options=request_options)

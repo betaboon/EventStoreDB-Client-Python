@@ -2,11 +2,18 @@
 # sources: operations.proto
 # plugin: python-betterproto
 from dataclasses import dataclass
-from typing import Dict
+from typing import TYPE_CHECKING, Dict, Optional
 
 import betterproto
 import grpclib
 from betterproto.grpc.grpclib_server import ServiceBase
+
+from ... import client as __client__
+
+if TYPE_CHECKING:
+    import grpclib.server
+    from betterproto.grpc.grpclib_client import MetadataLike
+    from grpclib.metadata import Deadline
 
 
 class ScavengeRespScavengeResult(betterproto.Enum):
@@ -49,171 +56,204 @@ class SetNodePriorityReq(betterproto.Message):
 
 class OperationsStub(betterproto.ServiceStub):
     async def start_scavenge(
-        self, *, options: "StartScavengeReqOptions" = None
+        self,
+        start_scavenge_req: "StartScavengeReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
     ) -> "ScavengeResp":
-
-        request = StartScavengeReq()
-        if options is not None:
-            request.options = options
-
         return await self._unary_unary(
             "/event_store.client.operations.Operations/StartScavenge",
-            request,
+            start_scavenge_req,
             ScavengeResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
     async def stop_scavenge(
-        self, *, options: "StopScavengeReqOptions" = None
+        self,
+        stop_scavenge_req: "StopScavengeReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
     ) -> "ScavengeResp":
-
-        request = StopScavengeReq()
-        if options is not None:
-            request.options = options
-
         return await self._unary_unary(
             "/event_store.client.operations.Operations/StopScavenge",
-            request,
+            stop_scavenge_req,
             ScavengeResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
-    async def shutdown(self) -> "__client__.Empty":
-
-        request = __client__.Empty()
-
+    async def shutdown(
+        self,
+        client_empty: "__client__.Empty",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "__client__.Empty":
         return await self._unary_unary(
             "/event_store.client.operations.Operations/Shutdown",
-            request,
+            client_empty,
             __client__.Empty,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
-    async def merge_indexes(self) -> "__client__.Empty":
-
-        request = __client__.Empty()
-
+    async def merge_indexes(
+        self,
+        client_empty: "__client__.Empty",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "__client__.Empty":
         return await self._unary_unary(
             "/event_store.client.operations.Operations/MergeIndexes",
-            request,
+            client_empty,
             __client__.Empty,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
-    async def resign_node(self) -> "__client__.Empty":
-
-        request = __client__.Empty()
-
+    async def resign_node(
+        self,
+        client_empty: "__client__.Empty",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "__client__.Empty":
         return await self._unary_unary(
             "/event_store.client.operations.Operations/ResignNode",
-            request,
+            client_empty,
             __client__.Empty,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
-    async def set_node_priority(self, *, priority: int = 0) -> "__client__.Empty":
-
-        request = SetNodePriorityReq()
-        request.priority = priority
-
+    async def set_node_priority(
+        self,
+        set_node_priority_req: "SetNodePriorityReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "__client__.Empty":
         return await self._unary_unary(
             "/event_store.client.operations.Operations/SetNodePriority",
-            request,
+            set_node_priority_req,
             __client__.Empty,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
-    async def restart_persistent_subscriptions(self) -> "__client__.Empty":
-
-        request = __client__.Empty()
-
+    async def restart_persistent_subscriptions(
+        self,
+        client_empty: "__client__.Empty",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "__client__.Empty":
         return await self._unary_unary(
             "/event_store.client.operations.Operations/RestartPersistentSubscriptions",
-            request,
+            client_empty,
             __client__.Empty,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
 
 class OperationsBase(ServiceBase):
     async def start_scavenge(
-        self, options: "StartScavengeReqOptions"
+        self, start_scavenge_req: "StartScavengeReq"
     ) -> "ScavengeResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def stop_scavenge(self, options: "StopScavengeReqOptions") -> "ScavengeResp":
+    async def stop_scavenge(
+        self, stop_scavenge_req: "StopScavengeReq"
+    ) -> "ScavengeResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def shutdown(self) -> "__client__.Empty":
+    async def shutdown(self, client_empty: "__client__.Empty") -> "__client__.Empty":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def merge_indexes(self) -> "__client__.Empty":
+    async def merge_indexes(
+        self, client_empty: "__client__.Empty"
+    ) -> "__client__.Empty":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def resign_node(self) -> "__client__.Empty":
+    async def resign_node(self, client_empty: "__client__.Empty") -> "__client__.Empty":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def set_node_priority(self, priority: int) -> "__client__.Empty":
+    async def set_node_priority(
+        self, set_node_priority_req: "SetNodePriorityReq"
+    ) -> "__client__.Empty":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def restart_persistent_subscriptions(self) -> "__client__.Empty":
+    async def restart_persistent_subscriptions(
+        self, client_empty: "__client__.Empty"
+    ) -> "__client__.Empty":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def __rpc_start_scavenge(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_start_scavenge(
+        self, stream: "grpclib.server.Stream[StartScavengeReq, ScavengeResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.start_scavenge(**request_kwargs)
+        response = await self.start_scavenge(request)
         await stream.send_message(response)
 
-    async def __rpc_stop_scavenge(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_stop_scavenge(
+        self, stream: "grpclib.server.Stream[StopScavengeReq, ScavengeResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.stop_scavenge(**request_kwargs)
+        response = await self.stop_scavenge(request)
         await stream.send_message(response)
 
-    async def __rpc_shutdown(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_shutdown(
+        self, stream: "grpclib.server.Stream[__client__.Empty, __client__.Empty]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {}
-
-        response = await self.shutdown(**request_kwargs)
+        response = await self.shutdown(request)
         await stream.send_message(response)
 
-    async def __rpc_merge_indexes(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_merge_indexes(
+        self, stream: "grpclib.server.Stream[__client__.Empty, __client__.Empty]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {}
-
-        response = await self.merge_indexes(**request_kwargs)
+        response = await self.merge_indexes(request)
         await stream.send_message(response)
 
-    async def __rpc_resign_node(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_resign_node(
+        self, stream: "grpclib.server.Stream[__client__.Empty, __client__.Empty]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {}
-
-        response = await self.resign_node(**request_kwargs)
+        response = await self.resign_node(request)
         await stream.send_message(response)
 
-    async def __rpc_set_node_priority(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_set_node_priority(
+        self, stream: "grpclib.server.Stream[SetNodePriorityReq, __client__.Empty]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "priority": request.priority,
-        }
-
-        response = await self.set_node_priority(**request_kwargs)
+        response = await self.set_node_priority(request)
         await stream.send_message(response)
 
     async def __rpc_restart_persistent_subscriptions(
-        self, stream: grpclib.server.Stream
+        self, stream: "grpclib.server.Stream[__client__.Empty, __client__.Empty]"
     ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {}
-
-        response = await self.restart_persistent_subscriptions(**request_kwargs)
+        response = await self.restart_persistent_subscriptions(request)
         await stream.send_message(response)
 
     def __mapping__(self) -> Dict[str, grpclib.const.Handler]:
@@ -261,6 +301,3 @@ class OperationsBase(ServiceBase):
                 __client__.Empty,
             ),
         }
-
-
-from ... import client as __client__

@@ -2,11 +2,18 @@
 # sources: cluster.proto
 # plugin: python-betterproto
 from dataclasses import dataclass
-from typing import Dict, List
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 import betterproto
 import grpclib
 from betterproto.grpc.grpclib_server import ServiceBase
+
+from .. import client as _client__
+
+if TYPE_CHECKING:
+    import grpclib.server
+    from betterproto.grpc.grpclib_client import MetadataLike
+    from grpclib.metadata import Deadline
 
 
 class MemberInfoVNodeState(betterproto.Enum):
@@ -146,260 +153,299 @@ class MemberInfo(betterproto.Message):
     advertise_tcp_port_to_client_as: int = betterproto.uint32_field(20)
 
 
+@dataclass(eq=False, repr=False)
+class ReplicaLogWrite(betterproto.Message):
+    log_position: int = betterproto.int64_field(1)
+    replica_id: bytes = betterproto.bytes_field(2)
+
+
+@dataclass(eq=False, repr=False)
+class ReplicatedTo(betterproto.Message):
+    log_position: int = betterproto.int64_field(1)
+
+
+@dataclass(eq=False, repr=False)
+class Epoch(betterproto.Message):
+    epoch_position: int = betterproto.int64_field(1)
+    epoch_number: int = betterproto.int32_field(2)
+    epoch_id: bytes = betterproto.bytes_field(3)
+
+
+@dataclass(eq=False, repr=False)
+class SubscribeReplica(betterproto.Message):
+    log_position: int = betterproto.int64_field(1)
+    chunk_id: bytes = betterproto.bytes_field(2)
+    last_epochs: List["Epoch"] = betterproto.message_field(3)
+    ip: bytes = betterproto.bytes_field(4)
+    port: int = betterproto.int32_field(5)
+    leader_id: bytes = betterproto.bytes_field(6)
+    subscription_id: bytes = betterproto.bytes_field(7)
+    is_promotable: bool = betterproto.bool_field(8)
+    version: int = betterproto.int32_field(9)
+
+
+@dataclass(eq=False, repr=False)
+class ReplicaSubscriptionRetry(betterproto.Message):
+    leader_id: bytes = betterproto.bytes_field(1)
+    subscription_id: bytes = betterproto.bytes_field(2)
+
+
+@dataclass(eq=False, repr=False)
+class ReplicaSubscribed(betterproto.Message):
+    leader_id: bytes = betterproto.bytes_field(1)
+    subscription_id: bytes = betterproto.bytes_field(2)
+    subscription_position: int = betterproto.int64_field(3)
+
+
+@dataclass(eq=False, repr=False)
+class ReplicaLogPositionAck(betterproto.Message):
+    subscription_id: bytes = betterproto.bytes_field(1)
+    replication_log_position: int = betterproto.int64_field(2)
+    writer_log_position: int = betterproto.int64_field(3)
+
+
+@dataclass(eq=False, repr=False)
+class CreateChunk(betterproto.Message):
+    leader_id: bytes = betterproto.bytes_field(1)
+    subscription_id: bytes = betterproto.bytes_field(2)
+    chunk_header_bytes: bytes = betterproto.bytes_field(3)
+    file_size: int = betterproto.int32_field(4)
+    is_completed_chunk: bool = betterproto.bool_field(5)
+
+
+@dataclass(eq=False, repr=False)
+class RawChunkBulk(betterproto.Message):
+    leader_id: bytes = betterproto.bytes_field(1)
+    subscription_id: bytes = betterproto.bytes_field(2)
+    chunk_start_number: int = betterproto.int32_field(3)
+    chunk_end_number: int = betterproto.int32_field(4)
+    raw_position: int = betterproto.int32_field(5)
+    raw_bytes: bytes = betterproto.bytes_field(6)
+    complete_chunk: bool = betterproto.bool_field(7)
+
+
+@dataclass(eq=False, repr=False)
+class DataChunkBulk(betterproto.Message):
+    leader_id: bytes = betterproto.bytes_field(1)
+    subscription_id: bytes = betterproto.bytes_field(2)
+    chunk_start_number: int = betterproto.int32_field(3)
+    chunk_end_number: int = betterproto.int32_field(4)
+    subscription_position: int = betterproto.int64_field(5)
+    data_bytes: bytes = betterproto.bytes_field(6)
+    complete_chunk: bool = betterproto.bool_field(7)
+
+
+@dataclass(eq=False, repr=False)
+class FollowerAssignment(betterproto.Message):
+    leader_id: bytes = betterproto.bytes_field(1)
+    subscription_id: bytes = betterproto.bytes_field(2)
+
+
+@dataclass(eq=False, repr=False)
+class CloneAssignment(betterproto.Message):
+    leader_id: bytes = betterproto.bytes_field(1)
+    subscription_id: bytes = betterproto.bytes_field(2)
+
+
+@dataclass(eq=False, repr=False)
+class DropSubscription(betterproto.Message):
+    leader_id: bytes = betterproto.bytes_field(1)
+    subscription_id: bytes = betterproto.bytes_field(2)
+
+
 class GossipStub(betterproto.ServiceStub):
     async def update(
-        self, *, info: "ClusterInfo" = None, server: "EndPoint" = None
+        self,
+        gossip_request: "GossipRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
     ) -> "ClusterInfo":
-
-        request = GossipRequest()
-        if info is not None:
-            request.info = info
-        if server is not None:
-            request.server = server
-
         return await self._unary_unary(
-            "/event_store.cluster.Gossip/Update", request, ClusterInfo
+            "/event_store.cluster.Gossip/Update",
+            gossip_request,
+            ClusterInfo,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
-    async def read(self) -> "ClusterInfo":
-
-        request = _client__.Empty()
-
+    async def read(
+        self,
+        client_empty: "_client__.Empty",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "ClusterInfo":
         return await self._unary_unary(
-            "/event_store.cluster.Gossip/Read", request, ClusterInfo
+            "/event_store.cluster.Gossip/Read",
+            client_empty,
+            ClusterInfo,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
 
 class ElectionsStub(betterproto.ServiceStub):
     async def view_change(
         self,
+        view_change_request: "ViewChangeRequest",
         *,
-        server_id: "_client__.Uuid" = None,
-        server_http: "EndPoint" = None,
-        attempted_view: int = 0
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
     ) -> "_client__.Empty":
-
-        request = ViewChangeRequest()
-        if server_id is not None:
-            request.server_id = server_id
-        if server_http is not None:
-            request.server_http = server_http
-        request.attempted_view = attempted_view
-
         return await self._unary_unary(
-            "/event_store.cluster.Elections/ViewChange", request, _client__.Empty
+            "/event_store.cluster.Elections/ViewChange",
+            view_change_request,
+            _client__.Empty,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
     async def view_change_proof(
         self,
+        view_change_proof_request: "ViewChangeProofRequest",
         *,
-        server_id: "_client__.Uuid" = None,
-        server_http: "EndPoint" = None,
-        installed_view: int = 0
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
     ) -> "_client__.Empty":
-
-        request = ViewChangeProofRequest()
-        if server_id is not None:
-            request.server_id = server_id
-        if server_http is not None:
-            request.server_http = server_http
-        request.installed_view = installed_view
-
         return await self._unary_unary(
-            "/event_store.cluster.Elections/ViewChangeProof", request, _client__.Empty
+            "/event_store.cluster.Elections/ViewChangeProof",
+            view_change_proof_request,
+            _client__.Empty,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
     async def prepare(
         self,
+        prepare_request: "PrepareRequest",
         *,
-        server_id: "_client__.Uuid" = None,
-        server_http: "EndPoint" = None,
-        view: int = 0
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
     ) -> "_client__.Empty":
-
-        request = PrepareRequest()
-        if server_id is not None:
-            request.server_id = server_id
-        if server_http is not None:
-            request.server_http = server_http
-        request.view = view
-
         return await self._unary_unary(
-            "/event_store.cluster.Elections/Prepare", request, _client__.Empty
+            "/event_store.cluster.Elections/Prepare",
+            prepare_request,
+            _client__.Empty,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
     async def prepare_ok(
         self,
+        prepare_ok_request: "PrepareOkRequest",
         *,
-        view: int = 0,
-        server_id: "_client__.Uuid" = None,
-        server_http: "EndPoint" = None,
-        epoch_number: int = 0,
-        epoch_position: int = 0,
-        epoch_id: "_client__.Uuid" = None,
-        epoch_leader_instance_id: "_client__.Uuid" = None,
-        last_commit_position: int = 0,
-        writer_checkpoint: int = 0,
-        chaser_checkpoint: int = 0,
-        node_priority: int = 0,
-        cluster_info: "ClusterInfo" = None
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
     ) -> "_client__.Empty":
-
-        request = PrepareOkRequest()
-        request.view = view
-        if server_id is not None:
-            request.server_id = server_id
-        if server_http is not None:
-            request.server_http = server_http
-        request.epoch_number = epoch_number
-        request.epoch_position = epoch_position
-        if epoch_id is not None:
-            request.epoch_id = epoch_id
-        if epoch_leader_instance_id is not None:
-            request.epoch_leader_instance_id = epoch_leader_instance_id
-        request.last_commit_position = last_commit_position
-        request.writer_checkpoint = writer_checkpoint
-        request.chaser_checkpoint = chaser_checkpoint
-        request.node_priority = node_priority
-        if cluster_info is not None:
-            request.cluster_info = cluster_info
-
         return await self._unary_unary(
-            "/event_store.cluster.Elections/PrepareOk", request, _client__.Empty
+            "/event_store.cluster.Elections/PrepareOk",
+            prepare_ok_request,
+            _client__.Empty,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
     async def proposal(
         self,
+        proposal_request: "ProposalRequest",
         *,
-        server_id: "_client__.Uuid" = None,
-        server_http: "EndPoint" = None,
-        leader_id: "_client__.Uuid" = None,
-        leader_http: "EndPoint" = None,
-        view: int = 0,
-        epoch_number: int = 0,
-        epoch_position: int = 0,
-        epoch_id: "_client__.Uuid" = None,
-        epoch_leader_instance_id: "_client__.Uuid" = None,
-        last_commit_position: int = 0,
-        writer_checkpoint: int = 0,
-        chaser_checkpoint: int = 0,
-        node_priority: int = 0
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
     ) -> "_client__.Empty":
-
-        request = ProposalRequest()
-        if server_id is not None:
-            request.server_id = server_id
-        if server_http is not None:
-            request.server_http = server_http
-        if leader_id is not None:
-            request.leader_id = leader_id
-        if leader_http is not None:
-            request.leader_http = leader_http
-        request.view = view
-        request.epoch_number = epoch_number
-        request.epoch_position = epoch_position
-        if epoch_id is not None:
-            request.epoch_id = epoch_id
-        if epoch_leader_instance_id is not None:
-            request.epoch_leader_instance_id = epoch_leader_instance_id
-        request.last_commit_position = last_commit_position
-        request.writer_checkpoint = writer_checkpoint
-        request.chaser_checkpoint = chaser_checkpoint
-        request.node_priority = node_priority
-
         return await self._unary_unary(
-            "/event_store.cluster.Elections/Proposal", request, _client__.Empty
+            "/event_store.cluster.Elections/Proposal",
+            proposal_request,
+            _client__.Empty,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
     async def accept(
         self,
+        accept_request: "AcceptRequest",
         *,
-        server_id: "_client__.Uuid" = None,
-        server_http: "EndPoint" = None,
-        leader_id: "_client__.Uuid" = None,
-        leader_http: "EndPoint" = None,
-        view: int = 0
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
     ) -> "_client__.Empty":
-
-        request = AcceptRequest()
-        if server_id is not None:
-            request.server_id = server_id
-        if server_http is not None:
-            request.server_http = server_http
-        if leader_id is not None:
-            request.leader_id = leader_id
-        if leader_http is not None:
-            request.leader_http = leader_http
-        request.view = view
-
         return await self._unary_unary(
-            "/event_store.cluster.Elections/Accept", request, _client__.Empty
+            "/event_store.cluster.Elections/Accept",
+            accept_request,
+            _client__.Empty,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
     async def leader_is_resigning(
-        self, *, leader_id: "_client__.Uuid" = None, leader_http: "EndPoint" = None
+        self,
+        leader_is_resigning_request: "LeaderIsResigningRequest",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
     ) -> "_client__.Empty":
-
-        request = LeaderIsResigningRequest()
-        if leader_id is not None:
-            request.leader_id = leader_id
-        if leader_http is not None:
-            request.leader_http = leader_http
-
         return await self._unary_unary(
-            "/event_store.cluster.Elections/LeaderIsResigning", request, _client__.Empty
+            "/event_store.cluster.Elections/LeaderIsResigning",
+            leader_is_resigning_request,
+            _client__.Empty,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
     async def leader_is_resigning_ok(
         self,
+        leader_is_resigning_ok_request: "LeaderIsResigningOkRequest",
         *,
-        leader_id: "_client__.Uuid" = None,
-        leader_http: "EndPoint" = None,
-        server_id: "_client__.Uuid" = None,
-        server_http: "EndPoint" = None
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
     ) -> "_client__.Empty":
-
-        request = LeaderIsResigningOkRequest()
-        if leader_id is not None:
-            request.leader_id = leader_id
-        if leader_http is not None:
-            request.leader_http = leader_http
-        if server_id is not None:
-            request.server_id = server_id
-        if server_http is not None:
-            request.server_http = server_http
-
         return await self._unary_unary(
             "/event_store.cluster.Elections/LeaderIsResigningOk",
-            request,
+            leader_is_resigning_ok_request,
             _client__.Empty,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
 
 class GossipBase(ServiceBase):
-    async def update(self, info: "ClusterInfo", server: "EndPoint") -> "ClusterInfo":
+    async def update(self, gossip_request: "GossipRequest") -> "ClusterInfo":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def read(self) -> "ClusterInfo":
+    async def read(self, client_empty: "_client__.Empty") -> "ClusterInfo":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def __rpc_update(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_update(
+        self, stream: "grpclib.server.Stream[GossipRequest, ClusterInfo]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "info": request.info,
-            "server": request.server,
-        }
-
-        response = await self.update(**request_kwargs)
+        response = await self.update(request)
         await stream.send_message(response)
 
-    async def __rpc_read(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_read(
+        self, stream: "grpclib.server.Stream[_client__.Empty, ClusterInfo]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {}
-
-        response = await self.read(**request_kwargs)
+        response = await self.read(request)
         await stream.send_message(response)
 
     def __mapping__(self) -> Dict[str, grpclib.const.Handler]:
@@ -421,194 +467,94 @@ class GossipBase(ServiceBase):
 
 class ElectionsBase(ServiceBase):
     async def view_change(
-        self, server_id: "_client__.Uuid", server_http: "EndPoint", attempted_view: int
+        self, view_change_request: "ViewChangeRequest"
     ) -> "_client__.Empty":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
     async def view_change_proof(
-        self, server_id: "_client__.Uuid", server_http: "EndPoint", installed_view: int
+        self, view_change_proof_request: "ViewChangeProofRequest"
     ) -> "_client__.Empty":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def prepare(
-        self, server_id: "_client__.Uuid", server_http: "EndPoint", view: int
-    ) -> "_client__.Empty":
+    async def prepare(self, prepare_request: "PrepareRequest") -> "_client__.Empty":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
     async def prepare_ok(
-        self,
-        view: int,
-        server_id: "_client__.Uuid",
-        server_http: "EndPoint",
-        epoch_number: int,
-        epoch_position: int,
-        epoch_id: "_client__.Uuid",
-        epoch_leader_instance_id: "_client__.Uuid",
-        last_commit_position: int,
-        writer_checkpoint: int,
-        chaser_checkpoint: int,
-        node_priority: int,
-        cluster_info: "ClusterInfo",
+        self, prepare_ok_request: "PrepareOkRequest"
     ) -> "_client__.Empty":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def proposal(
-        self,
-        server_id: "_client__.Uuid",
-        server_http: "EndPoint",
-        leader_id: "_client__.Uuid",
-        leader_http: "EndPoint",
-        view: int,
-        epoch_number: int,
-        epoch_position: int,
-        epoch_id: "_client__.Uuid",
-        epoch_leader_instance_id: "_client__.Uuid",
-        last_commit_position: int,
-        writer_checkpoint: int,
-        chaser_checkpoint: int,
-        node_priority: int,
-    ) -> "_client__.Empty":
+    async def proposal(self, proposal_request: "ProposalRequest") -> "_client__.Empty":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def accept(
-        self,
-        server_id: "_client__.Uuid",
-        server_http: "EndPoint",
-        leader_id: "_client__.Uuid",
-        leader_http: "EndPoint",
-        view: int,
-    ) -> "_client__.Empty":
+    async def accept(self, accept_request: "AcceptRequest") -> "_client__.Empty":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
     async def leader_is_resigning(
-        self, leader_id: "_client__.Uuid", leader_http: "EndPoint"
+        self, leader_is_resigning_request: "LeaderIsResigningRequest"
     ) -> "_client__.Empty":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
     async def leader_is_resigning_ok(
-        self,
-        leader_id: "_client__.Uuid",
-        leader_http: "EndPoint",
-        server_id: "_client__.Uuid",
-        server_http: "EndPoint",
+        self, leader_is_resigning_ok_request: "LeaderIsResigningOkRequest"
     ) -> "_client__.Empty":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def __rpc_view_change(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_view_change(
+        self, stream: "grpclib.server.Stream[ViewChangeRequest, _client__.Empty]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "server_id": request.server_id,
-            "server_http": request.server_http,
-            "attempted_view": request.attempted_view,
-        }
-
-        response = await self.view_change(**request_kwargs)
+        response = await self.view_change(request)
         await stream.send_message(response)
 
-    async def __rpc_view_change_proof(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_view_change_proof(
+        self, stream: "grpclib.server.Stream[ViewChangeProofRequest, _client__.Empty]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "server_id": request.server_id,
-            "server_http": request.server_http,
-            "installed_view": request.installed_view,
-        }
-
-        response = await self.view_change_proof(**request_kwargs)
+        response = await self.view_change_proof(request)
         await stream.send_message(response)
 
-    async def __rpc_prepare(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_prepare(
+        self, stream: "grpclib.server.Stream[PrepareRequest, _client__.Empty]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "server_id": request.server_id,
-            "server_http": request.server_http,
-            "view": request.view,
-        }
-
-        response = await self.prepare(**request_kwargs)
+        response = await self.prepare(request)
         await stream.send_message(response)
 
-    async def __rpc_prepare_ok(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_prepare_ok(
+        self, stream: "grpclib.server.Stream[PrepareOkRequest, _client__.Empty]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "view": request.view,
-            "server_id": request.server_id,
-            "server_http": request.server_http,
-            "epoch_number": request.epoch_number,
-            "epoch_position": request.epoch_position,
-            "epoch_id": request.epoch_id,
-            "epoch_leader_instance_id": request.epoch_leader_instance_id,
-            "last_commit_position": request.last_commit_position,
-            "writer_checkpoint": request.writer_checkpoint,
-            "chaser_checkpoint": request.chaser_checkpoint,
-            "node_priority": request.node_priority,
-            "cluster_info": request.cluster_info,
-        }
-
-        response = await self.prepare_ok(**request_kwargs)
+        response = await self.prepare_ok(request)
         await stream.send_message(response)
 
-    async def __rpc_proposal(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_proposal(
+        self, stream: "grpclib.server.Stream[ProposalRequest, _client__.Empty]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "server_id": request.server_id,
-            "server_http": request.server_http,
-            "leader_id": request.leader_id,
-            "leader_http": request.leader_http,
-            "view": request.view,
-            "epoch_number": request.epoch_number,
-            "epoch_position": request.epoch_position,
-            "epoch_id": request.epoch_id,
-            "epoch_leader_instance_id": request.epoch_leader_instance_id,
-            "last_commit_position": request.last_commit_position,
-            "writer_checkpoint": request.writer_checkpoint,
-            "chaser_checkpoint": request.chaser_checkpoint,
-            "node_priority": request.node_priority,
-        }
-
-        response = await self.proposal(**request_kwargs)
+        response = await self.proposal(request)
         await stream.send_message(response)
 
-    async def __rpc_accept(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_accept(
+        self, stream: "grpclib.server.Stream[AcceptRequest, _client__.Empty]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "server_id": request.server_id,
-            "server_http": request.server_http,
-            "leader_id": request.leader_id,
-            "leader_http": request.leader_http,
-            "view": request.view,
-        }
-
-        response = await self.accept(**request_kwargs)
+        response = await self.accept(request)
         await stream.send_message(response)
 
-    async def __rpc_leader_is_resigning(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_leader_is_resigning(
+        self, stream: "grpclib.server.Stream[LeaderIsResigningRequest, _client__.Empty]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "leader_id": request.leader_id,
-            "leader_http": request.leader_http,
-        }
-
-        response = await self.leader_is_resigning(**request_kwargs)
+        response = await self.leader_is_resigning(request)
         await stream.send_message(response)
 
-    async def __rpc_leader_is_resigning_ok(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_leader_is_resigning_ok(
+        self,
+        stream: "grpclib.server.Stream[LeaderIsResigningOkRequest, _client__.Empty]",
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "leader_id": request.leader_id,
-            "leader_http": request.leader_http,
-            "server_id": request.server_id,
-            "server_http": request.server_http,
-        }
-
-        response = await self.leader_is_resigning_ok(**request_kwargs)
+        response = await self.leader_is_resigning_ok(request)
         await stream.send_message(response)
 
     def __mapping__(self) -> Dict[str, grpclib.const.Handler]:
@@ -662,6 +608,3 @@ class ElectionsBase(ServiceBase):
                 _client__.Empty,
             ),
         }
-
-
-from .. import client as _client__

@@ -14,6 +14,7 @@ from eventstoredb.events import (
 )
 from eventstoredb.generated.event_store.client import Empty, StreamIdentifier
 from eventstoredb.generated.event_store.client.streams import (
+    ReadReq,
     ReadReqOptions,
     ReadReqOptionsReadDirection,
     ReadReqOptionsStreamOptions,
@@ -27,10 +28,10 @@ from eventstoredb.streams.read.types import ReadDirection, ReadStreamOptions
 from eventstoredb.streams.types import StreamPosition, StreamRevision
 
 
-def create_read_request_options(
+def create_read_request(
     stream_name: str,
     options: ReadStreamOptions | None = None,
-) -> ReadReqOptions:
+) -> ReadReq:
     if options is None:
         options = ReadStreamOptions()
 
@@ -55,7 +56,7 @@ def create_read_request_options(
     elif options.from_revision == StreamPosition.END:
         request_options.stream.end = Empty()
 
-    return request_options
+    return ReadReq(options=request_options)
 
 
 def convert_read_response(message: ReadResp) -> ReadEvent:
