@@ -16,6 +16,10 @@ from eventstoredb.generated.event_store.client import Empty, StreamIdentifier
 from eventstoredb.generated.event_store.client.streams import (
     ReadReq,
     ReadReqOptions,
+    ReadReqOptionsAllOptions,
+    ReadReqOptionsFilterOptions,
+    ReadReqOptionsFilterOptionsExpression,
+    ReadReqOptionsPosition,
     ReadReqOptionsReadDirection,
     ReadReqOptionsStreamOptions,
     ReadReqOptionsUuidOption,
@@ -24,8 +28,32 @@ from eventstoredb.generated.event_store.client.streams import (
     ReadRespReadEventRecordedEvent,
 )
 from eventstoredb.streams.read.exceptions import StreamNotFoundError
-from eventstoredb.streams.read.types import ReadDirection, ReadStreamOptions
-from eventstoredb.streams.types import StreamPosition, StreamRevision
+from eventstoredb.streams.read.types import (
+    EventTypeFilter,
+    ExcludeSystemEventsFilter,
+    ReadAllOptions,
+    ReadDirection,
+    ReadStreamOptions,
+    StreamNameFilter,
+)
+from eventstoredb.streams.types import AllPosition, StreamPosition, StreamRevision
+
+
+def create_read_request_options_common(
+    options: ReadAllOptions | ReadStreamOptions,
+) -> ReadReqOptions:
+    request_options = ReadReqOptions()
+
+    request_options.resolve_links = options.resolve_links
+    request_options.count = options.max_count
+    request_options.uuid_option = ReadReqOptionsUuidOption(string=Empty())
+
+    if options.direction == ReadDirection.FORWARDS:
+        request_options.read_direction = ReadReqOptionsReadDirection.Forwards
+    elif options.direction == ReadDirection.BACKWARDS:
+        request_options.read_direction = ReadReqOptionsReadDirection.Backwards
+
+    return request_options
 
 
 def create_read_request(
@@ -35,17 +63,9 @@ def create_read_request(
     if options is None:
         options = ReadStreamOptions()
 
-    request_options = ReadReqOptions()
-    request_options.resolve_links = options.resolve_links
-    request_options.count = options.max_count
+    request_options = create_read_request_options_common(options)
+
     request_options.no_filter = Empty()
-    request_options.uuid_option = ReadReqOptionsUuidOption(string=Empty())
-
-    if options.direction == ReadDirection.FORWARDS:
-        request_options.read_direction = ReadReqOptionsReadDirection.Forwards
-    elif options.direction == ReadDirection.BACKWARDS:
-        request_options.read_direction = ReadReqOptionsReadDirection.Backwards
-
     request_options.stream = ReadReqOptionsStreamOptions()
     request_options.stream.stream_identifier = StreamIdentifier(stream_name.encode())
 
@@ -55,6 +75,50 @@ def create_read_request(
         request_options.stream.start = Empty()
     elif options.from_revision == StreamPosition.END:
         request_options.stream.end = Empty()
+
+    return ReadReq(options=request_options)
+
+
+def create_read_all_request(options: ReadAllOptions | None = None) -> ReadReq:
+    if options is None:
+        options = ReadAllOptions()
+
+    request_options = create_read_request_options_common(options)
+
+    request_options.all = ReadReqOptionsAllOptions()
+
+    if isinstance(options.from_position, AllPosition):
+        request_options.all.position = ReadReqOptionsPosition()
+        request_options.all.position.commit_position = options.from_position.commit
+        request_options.all.position.prepare_position = options.from_position.prepare
+    elif options.from_position == StreamPosition.START:
+        request_options.all.start = Empty()
+    elif options.from_position == StreamPosition.END:
+        request_options.all.end = Empty()
+
+    if not options.filter:
+        request_options.no_filter = Empty()
+    else:
+        request_options.filter = ReadReqOptionsFilterOptions()
+        filter_expression = ReadReqOptionsFilterOptionsExpression()
+
+        if isinstance(options.filter, ExcludeSystemEventsFilter):
+            filter_expression.regex = "^[^\\$].*"
+        else:
+            if options.filter.regex:
+                filter_expression.regex = options.filter.regex
+            if options.filter.prefix:
+                filter_expression.prefix = options.filter.prefix
+
+        if isinstance(options.filter, ExcludeSystemEventsFilter):
+            request_options.filter.event_type = filter_expression
+        elif isinstance(options.filter, EventTypeFilter):
+            request_options.filter.event_type = filter_expression
+        elif isinstance(options.filter, StreamNameFilter):
+            request_options.filter.stream_identifier = filter_expression
+
+        request_options.filter.max = 0
+        request_options.filter.count = Empty()
 
     return ReadReq(options=request_options)
 
