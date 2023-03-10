@@ -4,7 +4,7 @@
 from dataclasses import dataclass
 
 import betterproto
-from betterproto.grpc.grpclib_server import ServiceBase
+import betterproto.lib.google.protobuf as betterproto_lib_google_protobuf
 
 
 @dataclass(eq=False, repr=False)
@@ -90,6 +90,3 @@ class MaximumAppendSizeExceeded(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class BadRequest(betterproto.Message):
     message: str = betterproto.string_field(1)
-
-
-import betterproto.lib.google.protobuf as betterproto_lib_google_protobuf

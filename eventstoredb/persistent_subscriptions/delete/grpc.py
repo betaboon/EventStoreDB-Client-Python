@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from eventstoredb.generated.event_store.client import StreamIdentifier
 from eventstoredb.generated.event_store.client.persistent_subscriptions import (
+    DeleteReq,
     DeleteReqOptions,
 )
 from eventstoredb.persistent_subscriptions.delete.types import (
@@ -9,11 +10,11 @@ from eventstoredb.persistent_subscriptions.delete.types import (
 )
 
 
-def create_delete_request_options(
+def create_delete_request(
     stream_name: str,
     group_name: str,
     options: DeletePersistentSubscriptionOptions | None = None,
-):
+) -> DeleteReq:
     if options is None:
         options = DeletePersistentSubscriptionOptions()
 
@@ -21,4 +22,4 @@ def create_delete_request_options(
     request_options.stream_identifier = StreamIdentifier(stream_name.encode())
     request_options.group_name = group_name
 
-    return request_options
+    return DeleteReq(options=request_options)

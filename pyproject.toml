@@ -46,7 +46,7 @@ lint = "pre-commit run --all-files"
 test = "pytest"
 
 [tool.pdm.scripts._.env]
-EVENTSTOREDB_VERSION = "oss-v21.10.8"
+EVENTSTOREDB_VERSION = "oss-v22.10.1"
 PROTOC_IN_PATH = "./external/EventStore/src/Protos/Grpc"
 PROTOC_OUT_PATH = "./eventstoredb/generated"
 

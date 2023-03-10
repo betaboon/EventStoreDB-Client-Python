@@ -2,11 +2,16 @@
 # sources: users.proto
 # plugin: python-betterproto
 from dataclasses import dataclass
-from typing import AsyncIterator, Dict, List
+from typing import TYPE_CHECKING, AsyncIterator, Dict, List, Optional
 
 import betterproto
 import grpclib
 from betterproto.grpc.grpclib_server import ServiceBase
+
+if TYPE_CHECKING:
+    import grpclib.server
+    from betterproto.grpc.grpclib_client import MetadataLike
+    from grpclib.metadata import Deadline
 
 
 @dataclass(eq=False, repr=False)
@@ -153,210 +158,230 @@ class ResetPasswordResp(betterproto.Message):
 
 
 class UsersStub(betterproto.ServiceStub):
-    async def create(self, *, options: "CreateReqOptions" = None) -> "CreateResp":
-
-        request = CreateReq()
-        if options is not None:
-            request.options = options
-
+    async def create(
+        self,
+        create_req: "CreateReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "CreateResp":
         return await self._unary_unary(
-            "/event_store.client.users.Users/Create", request, CreateResp
+            "/event_store.client.users.Users/Create",
+            create_req,
+            CreateResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
-    async def update(self, *, options: "UpdateReqOptions" = None) -> "UpdateResp":
-
-        request = UpdateReq()
-        if options is not None:
-            request.options = options
-
+    async def update(
+        self,
+        update_req: "UpdateReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "UpdateResp":
         return await self._unary_unary(
-            "/event_store.client.users.Users/Update", request, UpdateResp
+            "/event_store.client.users.Users/Update",
+            update_req,
+            UpdateResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
-    async def delete(self, *, options: "DeleteReqOptions" = None) -> "DeleteResp":
-
-        request = DeleteReq()
-        if options is not None:
-            request.options = options
-
+    async def delete(
+        self,
+        delete_req: "DeleteReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "DeleteResp":
         return await self._unary_unary(
-            "/event_store.client.users.Users/Delete", request, DeleteResp
+            "/event_store.client.users.Users/Delete",
+            delete_req,
+            DeleteResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
-    async def disable(self, *, options: "DisableReqOptions" = None) -> "DisableResp":
-
-        request = DisableReq()
-        if options is not None:
-            request.options = options
-
+    async def disable(
+        self,
+        disable_req: "DisableReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "DisableResp":
         return await self._unary_unary(
-            "/event_store.client.users.Users/Disable", request, DisableResp
+            "/event_store.client.users.Users/Disable",
+            disable_req,
+            DisableResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
-    async def enable(self, *, options: "EnableReqOptions" = None) -> "EnableResp":
-
-        request = EnableReq()
-        if options is not None:
-            request.options = options
-
+    async def enable(
+        self,
+        enable_req: "EnableReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "EnableResp":
         return await self._unary_unary(
-            "/event_store.client.users.Users/Enable", request, EnableResp
+            "/event_store.client.users.Users/Enable",
+            enable_req,
+            EnableResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
     async def details(
-        self, *, options: "DetailsReqOptions" = None
+        self,
+        details_req: "DetailsReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
     ) -> AsyncIterator["DetailsResp"]:
-
-        request = DetailsReq()
-        if options is not None:
-            request.options = options
-
         async for response in self._unary_stream(
             "/event_store.client.users.Users/Details",
-            request,
+            details_req,
             DetailsResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         ):
             yield response
 
     async def change_password(
-        self, *, options: "ChangePasswordReqOptions" = None
+        self,
+        change_password_req: "ChangePasswordReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
     ) -> "ChangePasswordResp":
-
-        request = ChangePasswordReq()
-        if options is not None:
-            request.options = options
-
         return await self._unary_unary(
             "/event_store.client.users.Users/ChangePassword",
-            request,
+            change_password_req,
             ChangePasswordResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
     async def reset_password(
-        self, *, options: "ResetPasswordReqOptions" = None
+        self,
+        reset_password_req: "ResetPasswordReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
     ) -> "ResetPasswordResp":
-
-        request = ResetPasswordReq()
-        if options is not None:
-            request.options = options
-
         return await self._unary_unary(
-            "/event_store.client.users.Users/ResetPassword", request, ResetPasswordResp
+            "/event_store.client.users.Users/ResetPassword",
+            reset_password_req,
+            ResetPasswordResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
 
 class UsersBase(ServiceBase):
-    async def create(self, options: "CreateReqOptions") -> "CreateResp":
+    async def create(self, create_req: "CreateReq") -> "CreateResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def update(self, options: "UpdateReqOptions") -> "UpdateResp":
+    async def update(self, update_req: "UpdateReq") -> "UpdateResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def delete(self, options: "DeleteReqOptions") -> "DeleteResp":
+    async def delete(self, delete_req: "DeleteReq") -> "DeleteResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def disable(self, options: "DisableReqOptions") -> "DisableResp":
+    async def disable(self, disable_req: "DisableReq") -> "DisableResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def enable(self, options: "EnableReqOptions") -> "EnableResp":
+    async def enable(self, enable_req: "EnableReq") -> "EnableResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def details(
-        self, options: "DetailsReqOptions"
-    ) -> AsyncIterator["DetailsResp"]:
+    async def details(self, details_req: "DetailsReq") -> AsyncIterator["DetailsResp"]:
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
     async def change_password(
-        self, options: "ChangePasswordReqOptions"
+        self, change_password_req: "ChangePasswordReq"
     ) -> "ChangePasswordResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
     async def reset_password(
-        self, options: "ResetPasswordReqOptions"
+        self, reset_password_req: "ResetPasswordReq"
     ) -> "ResetPasswordResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def __rpc_create(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_create(
+        self, stream: "grpclib.server.Stream[CreateReq, CreateResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.create(**request_kwargs)
+        response = await self.create(request)
         await stream.send_message(response)
 
-    async def __rpc_update(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_update(
+        self, stream: "grpclib.server.Stream[UpdateReq, UpdateResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.update(**request_kwargs)
+        response = await self.update(request)
         await stream.send_message(response)
 
-    async def __rpc_delete(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_delete(
+        self, stream: "grpclib.server.Stream[DeleteReq, DeleteResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.delete(**request_kwargs)
+        response = await self.delete(request)
         await stream.send_message(response)
 
-    async def __rpc_disable(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_disable(
+        self, stream: "grpclib.server.Stream[DisableReq, DisableResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.disable(**request_kwargs)
+        response = await self.disable(request)
         await stream.send_message(response)
 
-    async def __rpc_enable(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_enable(
+        self, stream: "grpclib.server.Stream[EnableReq, EnableResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.enable(**request_kwargs)
+        response = await self.enable(request)
         await stream.send_message(response)
 
-    async def __rpc_details(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_details(
+        self, stream: "grpclib.server.Stream[DetailsReq, DetailsResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
         await self._call_rpc_handler_server_stream(
             self.details,
             stream,
-            request_kwargs,
+            request,
         )
 
-    async def __rpc_change_password(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_change_password(
+        self, stream: "grpclib.server.Stream[ChangePasswordReq, ChangePasswordResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.change_password(**request_kwargs)
+        response = await self.change_password(request)
         await stream.send_message(response)
 
-    async def __rpc_reset_password(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_reset_password(
+        self, stream: "grpclib.server.Stream[ResetPasswordReq, ResetPasswordResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.reset_password(**request_kwargs)
+        response = await self.reset_password(request)
         await stream.send_message(response)
 
     def __mapping__(self) -> Dict[str, grpclib.const.Handler]:

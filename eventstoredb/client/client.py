@@ -14,11 +14,11 @@ from eventstoredb.generated.event_store.client.streams import StreamsStub
 from eventstoredb.persistent_subscriptions.common import convert_grpc_error_to_exception
 from eventstoredb.persistent_subscriptions.create import (
     CreatePersistentSubscriptionOptions,
-    create_create_request_options,
+    create_create_request,
 )
 from eventstoredb.persistent_subscriptions.delete import (
     DeletePersistentSubscriptionOptions,
-    create_delete_request_options,
+    create_delete_request,
 )
 from eventstoredb.persistent_subscriptions.subscribe import (
     PersistentSubscription,
@@ -26,7 +26,7 @@ from eventstoredb.persistent_subscriptions.subscribe import (
 )
 from eventstoredb.persistent_subscriptions.update import (
     UpdatePersistentSubscriptionOptions,
-    create_update_request_options,
+    create_update_request,
 )
 from eventstoredb.streams.append import (
     AppendReq,
@@ -39,12 +39,12 @@ from eventstoredb.streams.append import (
 from eventstoredb.streams.read import (
     ReadStreamOptions,
     convert_read_response,
-    create_read_request_options,
+    create_read_request,
 )
 from eventstoredb.streams.subscribe import (
     SubscribeToStreamOptions,
     Subscription,
-    create_stream_subscription_options,
+    create_subscribe_request,
 )
 
 
@@ -89,12 +89,12 @@ class Client:
         options: ReadStreamOptions | None = None,
     ) -> AsyncIterator[ReadEvent]:
         client = StreamsStub(channel=self.channel)
-        request_options = create_read_request_options(
+        request = create_read_request(
             stream_name=stream_name,
             options=options,
         )
         # TODO raise exception StreamNotFoundError
-        async for response in client.read(options=request_options):
+        async for response in client.read(read_req=request):
             yield convert_read_response(response)
 
     def subscribe_to_stream(
@@ -103,11 +103,11 @@ class Client:
         options: SubscribeToStreamOptions | None = None,
     ) -> Subscription:
         client = StreamsStub(channel=self.channel)
-        request_options = create_stream_subscription_options(
+        request = create_subscribe_request(
             stream_name=stream_name,
             options=options,
         )
-        it = client.read(options=request_options)
+        it = client.read(read_req=request)
         return Subscription(it)
 
     async def create_persistent_subscription(
@@ -117,13 +117,13 @@ class Client:
         options: CreatePersistentSubscriptionOptions | None = None,
     ) -> None:
         client = PersistentSubscriptionsStub(channel=self.channel)
-        request_options = create_create_request_options(
+        request = create_create_request(
             stream_name=stream_name,
             group_name=group_name,
             options=options,
         )
         try:
-            await client.create(options=request_options)
+            await client.create(create_req=request)
         except GRPCError as e:
             raise convert_grpc_error_to_exception(e)
 
@@ -134,13 +134,13 @@ class Client:
         options: UpdatePersistentSubscriptionOptions | None = None,
     ) -> None:
         client = PersistentSubscriptionsStub(channel=self.channel)
-        request_options = create_update_request_options(
+        request = create_update_request(
             stream_name=stream_name,
             group_name=group_name,
             options=options,
         )
         try:
-            await client.update(options=request_options)
+            await client.update(update_req=request)
         except GRPCError as e:
             raise convert_grpc_error_to_exception(e)
 
@@ -151,13 +151,13 @@ class Client:
         options: DeletePersistentSubscriptionOptions | None = None,
     ) -> None:
         client = PersistentSubscriptionsStub(channel=self.channel)
-        request_options = create_delete_request_options(
+        request = create_delete_request(
             stream_name=stream_name,
             group_name=group_name,
             options=options,
         )
         try:
-            await client.delete(options=request_options)
+            await client.delete(delete_req=request)
         except GRPCError as e:
             raise convert_grpc_error_to_exception(e)
 

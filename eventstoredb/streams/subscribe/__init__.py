@@ -1,3 +1,3 @@
-from eventstoredb.streams.subscribe.grpc import create_stream_subscription_options
+from eventstoredb.streams.subscribe.grpc import create_subscribe_request
 from eventstoredb.streams.subscribe.subscription import Subscription
 from eventstoredb.streams.subscribe.types import SubscribeToStreamOptions

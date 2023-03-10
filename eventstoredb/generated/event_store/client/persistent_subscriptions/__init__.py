@@ -3,11 +3,27 @@
 # plugin: python-betterproto
 import warnings
 from dataclasses import dataclass
-from typing import AsyncIterable, AsyncIterator, Dict, Iterable, List, Union
+from typing import (
+    TYPE_CHECKING,
+    AsyncIterable,
+    AsyncIterator,
+    Dict,
+    Iterable,
+    List,
+    Optional,
+    Union,
+)
 
 import betterproto
 import grpclib
 from betterproto.grpc.grpclib_server import ServiceBase
+
+from ... import client as __client__
+
+if TYPE_CHECKING:
+    import grpclib.server
+    from betterproto.grpc.grpclib_client import MetadataLike
+    from grpclib.metadata import Deadline
 
 
 class ReadReqNackAction(betterproto.Enum):
@@ -122,7 +138,7 @@ class CreateReqOptions(betterproto.Message):
 
     def __post_init__(self) -> None:
         super().__post_init__()
-        if self.stream_identifier:
+        if self.is_set("stream_identifier"):
             warnings.warn(
                 "CreateReqOptions.stream_identifier is deprecated", DeprecationWarning
             )
@@ -193,11 +209,11 @@ class CreateReqSettings(betterproto.Message):
 
     def __post_init__(self) -> None:
         super().__post_init__()
-        if self.revision:
+        if self.is_set("revision"):
             warnings.warn(
                 "CreateReqSettings.revision is deprecated", DeprecationWarning
             )
-        if self.named_consumer_strategy:
+        if self.is_set("named_consumer_strategy"):
             warnings.warn(
                 "CreateReqSettings.named_consumer_strategy is deprecated",
                 DeprecationWarning,
@@ -226,7 +242,7 @@ class UpdateReqOptions(betterproto.Message):
 
     def __post_init__(self) -> None:
         super().__post_init__()
-        if self.stream_identifier:
+        if self.is_set("stream_identifier"):
             warnings.warn(
                 "UpdateReqOptions.stream_identifier is deprecated", DeprecationWarning
             )
@@ -273,7 +289,7 @@ class UpdateReqSettings(betterproto.Message):
 
     def __post_init__(self) -> None:
         super().__post_init__()
-        if self.revision:
+        if self.is_set("revision"):
             warnings.warn(
                 "UpdateReqSettings.revision is deprecated", DeprecationWarning
             )
@@ -425,207 +441,233 @@ class ListResp(betterproto.Message):
 
 
 class PersistentSubscriptionsStub(betterproto.ServiceStub):
-    async def create(self, *, options: "CreateReqOptions" = None) -> "CreateResp":
-
-        request = CreateReq()
-        if options is not None:
-            request.options = options
-
+    async def create(
+        self,
+        create_req: "CreateReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "CreateResp":
         return await self._unary_unary(
             "/event_store.client.persistent_subscriptions.PersistentSubscriptions/Create",
-            request,
+            create_req,
             CreateResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
-    async def update(self, *, options: "UpdateReqOptions" = None) -> "UpdateResp":
-
-        request = UpdateReq()
-        if options is not None:
-            request.options = options
-
+    async def update(
+        self,
+        update_req: "UpdateReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "UpdateResp":
         return await self._unary_unary(
             "/event_store.client.persistent_subscriptions.PersistentSubscriptions/Update",
-            request,
+            update_req,
             UpdateResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
-    async def delete(self, *, options: "DeleteReqOptions" = None) -> "DeleteResp":
-
-        request = DeleteReq()
-        if options is not None:
-            request.options = options
-
+    async def delete(
+        self,
+        delete_req: "DeleteReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "DeleteResp":
         return await self._unary_unary(
             "/event_store.client.persistent_subscriptions.PersistentSubscriptions/Delete",
-            request,
+            delete_req,
             DeleteResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
     async def read(
-        self, request_iterator: Union[AsyncIterable["ReadReq"], Iterable["ReadReq"]]
+        self,
+        read_req_iterator: Union[AsyncIterable["ReadReq"], Iterable["ReadReq"]],
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
     ) -> AsyncIterator["ReadResp"]:
-
         async for response in self._stream_stream(
             "/event_store.client.persistent_subscriptions.PersistentSubscriptions/Read",
-            request_iterator,
+            read_req_iterator,
             ReadReq,
             ReadResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         ):
             yield response
 
-    async def get_info(self, *, options: "GetInfoReqOptions" = None) -> "GetInfoResp":
-
-        request = GetInfoReq()
-        if options is not None:
-            request.options = options
-
+    async def get_info(
+        self,
+        get_info_req: "GetInfoReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "GetInfoResp":
         return await self._unary_unary(
             "/event_store.client.persistent_subscriptions.PersistentSubscriptions/GetInfo",
-            request,
+            get_info_req,
             GetInfoResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
     async def replay_parked(
-        self, *, options: "ReplayParkedReqOptions" = None
+        self,
+        replay_parked_req: "ReplayParkedReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
     ) -> "ReplayParkedResp":
-
-        request = ReplayParkedReq()
-        if options is not None:
-            request.options = options
-
         return await self._unary_unary(
             "/event_store.client.persistent_subscriptions.PersistentSubscriptions/ReplayParked",
-            request,
+            replay_parked_req,
             ReplayParkedResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
-    async def list(self, *, options: "ListReqOptions" = None) -> "ListResp":
-
-        request = ListReq()
-        if options is not None:
-            request.options = options
-
+    async def list(
+        self,
+        list_req: "ListReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "ListResp":
         return await self._unary_unary(
             "/event_store.client.persistent_subscriptions.PersistentSubscriptions/List",
-            request,
+            list_req,
             ListResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
-    async def restart_subsystem(self) -> "__client__.Empty":
-
-        request = __client__.Empty()
-
+    async def restart_subsystem(
+        self,
+        client_empty: "__client__.Empty",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "__client__.Empty":
         return await self._unary_unary(
             "/event_store.client.persistent_subscriptions.PersistentSubscriptions/RestartSubsystem",
-            request,
+            client_empty,
             __client__.Empty,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
 
 class PersistentSubscriptionsBase(ServiceBase):
-    async def create(self, options: "CreateReqOptions") -> "CreateResp":
+    async def create(self, create_req: "CreateReq") -> "CreateResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def update(self, options: "UpdateReqOptions") -> "UpdateResp":
+    async def update(self, update_req: "UpdateReq") -> "UpdateResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def delete(self, options: "DeleteReqOptions") -> "DeleteResp":
+    async def delete(self, delete_req: "DeleteReq") -> "DeleteResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
     async def read(
-        self, request_iterator: AsyncIterator["ReadReq"]
+        self, read_req_iterator: AsyncIterator["ReadReq"]
     ) -> AsyncIterator["ReadResp"]:
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def get_info(self, options: "GetInfoReqOptions") -> "GetInfoResp":
+    async def get_info(self, get_info_req: "GetInfoReq") -> "GetInfoResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
     async def replay_parked(
-        self, options: "ReplayParkedReqOptions"
+        self, replay_parked_req: "ReplayParkedReq"
     ) -> "ReplayParkedResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def list(self, options: "ListReqOptions") -> "ListResp":
+    async def list(self, list_req: "ListReq") -> "ListResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def restart_subsystem(self) -> "__client__.Empty":
+    async def restart_subsystem(
+        self, client_empty: "__client__.Empty"
+    ) -> "__client__.Empty":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def __rpc_create(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_create(
+        self, stream: "grpclib.server.Stream[CreateReq, CreateResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.create(**request_kwargs)
+        response = await self.create(request)
         await stream.send_message(response)
 
-    async def __rpc_update(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_update(
+        self, stream: "grpclib.server.Stream[UpdateReq, UpdateResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.update(**request_kwargs)
+        response = await self.update(request)
         await stream.send_message(response)
 
-    async def __rpc_delete(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_delete(
+        self, stream: "grpclib.server.Stream[DeleteReq, DeleteResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.delete(**request_kwargs)
+        response = await self.delete(request)
         await stream.send_message(response)
 
-    async def __rpc_read(self, stream: grpclib.server.Stream) -> None:
-        request_kwargs = {"request_iterator": stream.__aiter__()}
-
+    async def __rpc_read(
+        self, stream: "grpclib.server.Stream[ReadReq, ReadResp]"
+    ) -> None:
+        request = stream.__aiter__()
         await self._call_rpc_handler_server_stream(
             self.read,
             stream,
-            request_kwargs,
+            request,
         )
 
-    async def __rpc_get_info(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_get_info(
+        self, stream: "grpclib.server.Stream[GetInfoReq, GetInfoResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.get_info(**request_kwargs)
+        response = await self.get_info(request)
         await stream.send_message(response)
 
-    async def __rpc_replay_parked(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_replay_parked(
+        self, stream: "grpclib.server.Stream[ReplayParkedReq, ReplayParkedResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.replay_parked(**request_kwargs)
+        response = await self.replay_parked(request)
         await stream.send_message(response)
 
-    async def __rpc_list(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_list(
+        self, stream: "grpclib.server.Stream[ListReq, ListResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.list(**request_kwargs)
+        response = await self.list(request)
         await stream.send_message(response)
 
-    async def __rpc_restart_subsystem(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_restart_subsystem(
+        self, stream: "grpclib.server.Stream[__client__.Empty, __client__.Empty]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {}
-
-        response = await self.restart_subsystem(**request_kwargs)
+        response = await self.restart_subsystem(request)
         await stream.send_message(response)
 
     def __mapping__(self) -> Dict[str, grpclib.const.Handler]:
@@ -679,6 +721,3 @@ class PersistentSubscriptionsBase(ServiceBase):
                 __client__.Empty,
             ),
         }
-
-
-from ... import client as __client__

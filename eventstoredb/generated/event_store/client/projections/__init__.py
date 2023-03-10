@@ -2,11 +2,19 @@
 # sources: projections.proto
 # plugin: python-betterproto
 from dataclasses import dataclass
-from typing import AsyncIterator, Dict
+from typing import TYPE_CHECKING, AsyncIterator, Dict, Optional
 
 import betterproto
+import betterproto.lib.google.protobuf as betterproto_lib_google_protobuf
 import grpclib
 from betterproto.grpc.grpclib_server import ServiceBase
+
+from ... import client as __client__
+
+if TYPE_CHECKING:
+    import grpclib.server
+    from betterproto.grpc.grpclib_client import MetadataLike
+    from grpclib.metadata import Deadline
 
 
 @dataclass(eq=False, repr=False)
@@ -32,7 +40,8 @@ class CreateReqOptionsTransient(betterproto.Message):
 @dataclass(eq=False, repr=False)
 class CreateReqOptionsContinuous(betterproto.Message):
     name: str = betterproto.string_field(1)
-    track_emitted_streams: bool = betterproto.bool_field(2)
+    emit_enabled: bool = betterproto.bool_field(2)
+    track_emitted_streams: bool = betterproto.bool_field(3)
 
 
 @dataclass(eq=False, repr=False)
@@ -200,244 +209,284 @@ class DisableResp(betterproto.Message):
 
 
 class ProjectionsStub(betterproto.ServiceStub):
-    async def create(self, *, options: "CreateReqOptions" = None) -> "CreateResp":
-
-        request = CreateReq()
-        if options is not None:
-            request.options = options
-
+    async def create(
+        self,
+        create_req: "CreateReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "CreateResp":
         return await self._unary_unary(
-            "/event_store.client.projections.Projections/Create", request, CreateResp
+            "/event_store.client.projections.Projections/Create",
+            create_req,
+            CreateResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
-    async def update(self, *, options: "UpdateReqOptions" = None) -> "UpdateResp":
-
-        request = UpdateReq()
-        if options is not None:
-            request.options = options
-
+    async def update(
+        self,
+        update_req: "UpdateReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "UpdateResp":
         return await self._unary_unary(
-            "/event_store.client.projections.Projections/Update", request, UpdateResp
+            "/event_store.client.projections.Projections/Update",
+            update_req,
+            UpdateResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
-    async def delete(self, *, options: "DeleteReqOptions" = None) -> "DeleteResp":
-
-        request = DeleteReq()
-        if options is not None:
-            request.options = options
-
+    async def delete(
+        self,
+        delete_req: "DeleteReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "DeleteResp":
         return await self._unary_unary(
-            "/event_store.client.projections.Projections/Delete", request, DeleteResp
+            "/event_store.client.projections.Projections/Delete",
+            delete_req,
+            DeleteResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
     async def statistics(
-        self, *, options: "StatisticsReqOptions" = None
+        self,
+        statistics_req: "StatisticsReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
     ) -> AsyncIterator["StatisticsResp"]:
-
-        request = StatisticsReq()
-        if options is not None:
-            request.options = options
-
         async for response in self._unary_stream(
             "/event_store.client.projections.Projections/Statistics",
-            request,
+            statistics_req,
             StatisticsResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         ):
             yield response
 
-    async def disable(self, *, options: "DisableReqOptions" = None) -> "DisableResp":
-
-        request = DisableReq()
-        if options is not None:
-            request.options = options
-
+    async def disable(
+        self,
+        disable_req: "DisableReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "DisableResp":
         return await self._unary_unary(
-            "/event_store.client.projections.Projections/Disable", request, DisableResp
+            "/event_store.client.projections.Projections/Disable",
+            disable_req,
+            DisableResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
-    async def enable(self, *, options: "EnableReqOptions" = None) -> "EnableResp":
-
-        request = EnableReq()
-        if options is not None:
-            request.options = options
-
+    async def enable(
+        self,
+        enable_req: "EnableReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "EnableResp":
         return await self._unary_unary(
-            "/event_store.client.projections.Projections/Enable", request, EnableResp
+            "/event_store.client.projections.Projections/Enable",
+            enable_req,
+            EnableResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
-    async def reset(self, *, options: "ResetReqOptions" = None) -> "ResetResp":
-
-        request = ResetReq()
-        if options is not None:
-            request.options = options
-
+    async def reset(
+        self,
+        reset_req: "ResetReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "ResetResp":
         return await self._unary_unary(
-            "/event_store.client.projections.Projections/Reset", request, ResetResp
+            "/event_store.client.projections.Projections/Reset",
+            reset_req,
+            ResetResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
-    async def state(self, *, options: "StateReqOptions" = None) -> "StateResp":
-
-        request = StateReq()
-        if options is not None:
-            request.options = options
-
+    async def state(
+        self,
+        state_req: "StateReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "StateResp":
         return await self._unary_unary(
-            "/event_store.client.projections.Projections/State", request, StateResp
+            "/event_store.client.projections.Projections/State",
+            state_req,
+            StateResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
-    async def result(self, *, options: "ResultReqOptions" = None) -> "ResultResp":
-
-        request = ResultReq()
-        if options is not None:
-            request.options = options
-
+    async def result(
+        self,
+        result_req: "ResultReq",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "ResultResp":
         return await self._unary_unary(
-            "/event_store.client.projections.Projections/Result", request, ResultResp
+            "/event_store.client.projections.Projections/Result",
+            result_req,
+            ResultResp,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
-    async def restart_subsystem(self) -> "__client__.Empty":
-
-        request = __client__.Empty()
-
+    async def restart_subsystem(
+        self,
+        client_empty: "__client__.Empty",
+        *,
+        timeout: Optional[float] = None,
+        deadline: Optional["Deadline"] = None,
+        metadata: Optional["MetadataLike"] = None,
+    ) -> "__client__.Empty":
         return await self._unary_unary(
             "/event_store.client.projections.Projections/RestartSubsystem",
-            request,
+            client_empty,
             __client__.Empty,
+            timeout=timeout,
+            deadline=deadline,
+            metadata=metadata,
         )
 
 
 class ProjectionsBase(ServiceBase):
-    async def create(self, options: "CreateReqOptions") -> "CreateResp":
+    async def create(self, create_req: "CreateReq") -> "CreateResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def update(self, options: "UpdateReqOptions") -> "UpdateResp":
+    async def update(self, update_req: "UpdateReq") -> "UpdateResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def delete(self, options: "DeleteReqOptions") -> "DeleteResp":
+    async def delete(self, delete_req: "DeleteReq") -> "DeleteResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
     async def statistics(
-        self, options: "StatisticsReqOptions"
+        self, statistics_req: "StatisticsReq"
     ) -> AsyncIterator["StatisticsResp"]:
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def disable(self, options: "DisableReqOptions") -> "DisableResp":
+    async def disable(self, disable_req: "DisableReq") -> "DisableResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def enable(self, options: "EnableReqOptions") -> "EnableResp":
+    async def enable(self, enable_req: "EnableReq") -> "EnableResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def reset(self, options: "ResetReqOptions") -> "ResetResp":
+    async def reset(self, reset_req: "ResetReq") -> "ResetResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def state(self, options: "StateReqOptions") -> "StateResp":
+    async def state(self, state_req: "StateReq") -> "StateResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def result(self, options: "ResultReqOptions") -> "ResultResp":
+    async def result(self, result_req: "ResultReq") -> "ResultResp":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def restart_subsystem(self) -> "__client__.Empty":
+    async def restart_subsystem(
+        self, client_empty: "__client__.Empty"
+    ) -> "__client__.Empty":
         raise grpclib.GRPCError(grpclib.const.Status.UNIMPLEMENTED)
 
-    async def __rpc_create(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_create(
+        self, stream: "grpclib.server.Stream[CreateReq, CreateResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.create(**request_kwargs)
+        response = await self.create(request)
         await stream.send_message(response)
 
-    async def __rpc_update(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_update(
+        self, stream: "grpclib.server.Stream[UpdateReq, UpdateResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.update(**request_kwargs)
+        response = await self.update(request)
         await stream.send_message(response)
 
-    async def __rpc_delete(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_delete(
+        self, stream: "grpclib.server.Stream[DeleteReq, DeleteResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.delete(**request_kwargs)
+        response = await self.delete(request)
         await stream.send_message(response)
 
-    async def __rpc_statistics(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_statistics(
+        self, stream: "grpclib.server.Stream[StatisticsReq, StatisticsResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
         await self._call_rpc_handler_server_stream(
             self.statistics,
             stream,
-            request_kwargs,
+            request,
         )
 
-    async def __rpc_disable(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_disable(
+        self, stream: "grpclib.server.Stream[DisableReq, DisableResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.disable(**request_kwargs)
+        response = await self.disable(request)
         await stream.send_message(response)
 
-    async def __rpc_enable(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_enable(
+        self, stream: "grpclib.server.Stream[EnableReq, EnableResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.enable(**request_kwargs)
+        response = await self.enable(request)
         await stream.send_message(response)
 
-    async def __rpc_reset(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_reset(
+        self, stream: "grpclib.server.Stream[ResetReq, ResetResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.reset(**request_kwargs)
+        response = await self.reset(request)
         await stream.send_message(response)
 
-    async def __rpc_state(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_state(
+        self, stream: "grpclib.server.Stream[StateReq, StateResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.state(**request_kwargs)
+        response = await self.state(request)
         await stream.send_message(response)
 
-    async def __rpc_result(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_result(
+        self, stream: "grpclib.server.Stream[ResultReq, ResultResp]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {
-            "options": request.options,
-        }
-
-        response = await self.result(**request_kwargs)
+        response = await self.result(request)
         await stream.send_message(response)
 
-    async def __rpc_restart_subsystem(self, stream: grpclib.server.Stream) -> None:
+    async def __rpc_restart_subsystem(
+        self, stream: "grpclib.server.Stream[__client__.Empty, __client__.Empty]"
+    ) -> None:
         request = await stream.recv_message()
-
-        request_kwargs = {}
-
-        response = await self.restart_subsystem(**request_kwargs)
+        response = await self.restart_subsystem(request)
         await stream.send_message(response)
 
     def __mapping__(self) -> Dict[str, grpclib.const.Handler]:
@@ -503,8 +552,3 @@ class ProjectionsBase(ServiceBase):
                 __client__.Empty,
             ),
         }
-
-
-import betterproto.lib.google.protobuf as betterproto_lib_google_protobuf
-
-from ... import client as __client__
