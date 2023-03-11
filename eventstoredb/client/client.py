@@ -44,9 +44,11 @@ from eventstoredb.streams.read import (
     create_read_request,
 )
 from eventstoredb.streams.subscribe import (
+    SubscribeToAllOptions,
     SubscribeToStreamOptions,
     Subscription,
-    create_subscribe_request,
+    create_subscribe_to_all_request,
+    create_subscribe_to_stream_request,
 )
 
 
@@ -117,10 +119,19 @@ class Client:
         options: SubscribeToStreamOptions | None = None,
     ) -> Subscription:
         client = StreamsStub(channel=self.channel)
-        request = create_subscribe_request(
+        request = create_subscribe_to_stream_request(
             stream_name=stream_name,
             options=options,
         )
+        it = client.read(read_req=request)
+        return Subscription(it)
+
+    def subscribe_to_all(
+        self,
+        options: SubscribeToAllOptions | None = None,
+    ) -> Subscription:
+        client = StreamsStub(channel=self.channel)
+        request = create_subscribe_to_all_request(options=options)
         it = client.read(read_req=request)
         return Subscription(it)
 
