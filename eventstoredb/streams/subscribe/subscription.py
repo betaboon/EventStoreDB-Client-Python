@@ -3,10 +3,12 @@ from __future__ import annotations
 from typing import AsyncIterator
 from uuid import UUID
 
+import betterproto
+
 from eventstoredb.events import ReadEvent
 from eventstoredb.generated.event_store.client.streams import ReadResp
-from eventstoredb.streams.subscribe.grpc import convert_read_response
-from eventstoredb.streams.subscribe.types import SubscriptionConfirmation
+from eventstoredb.streams.read.grpc import convert_read_response_read_event
+from eventstoredb.streams.subscribe.grpc import convert_read_response_confirmation
 
 
 class Subscription(AsyncIterator[ReadEvent]):
@@ -20,8 +22,10 @@ class Subscription(AsyncIterator[ReadEvent]):
     async def __anext__(self) -> ReadEvent:
         while True:
             response = await self._it.__anext__()
-            event = convert_read_response(response)
-            if isinstance(event, SubscriptionConfirmation):
+
+            content_type, _ = betterproto.which_one_of(response, "content")
+            if content_type == "confirmation":
+                event = convert_read_response_confirmation(response.confirmation)
                 self.id = event.id
-            else:
-                return event
+            elif content_type == "event":
+                return convert_read_response_read_event(response.event)

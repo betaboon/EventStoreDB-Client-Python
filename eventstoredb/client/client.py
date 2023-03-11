@@ -37,14 +37,18 @@ from eventstoredb.streams.append import (
     create_append_request,
 )
 from eventstoredb.streams.read import (
+    ReadAllOptions,
     ReadStreamOptions,
     convert_read_response,
+    create_read_all_request,
     create_read_request,
 )
 from eventstoredb.streams.subscribe import (
+    SubscribeToAllOptions,
     SubscribeToStreamOptions,
     Subscription,
-    create_subscribe_request,
+    create_subscribe_to_all_request,
+    create_subscribe_to_stream_request,
 )
 
 
@@ -97,16 +101,37 @@ class Client:
         async for response in client.read(read_req=request):
             yield convert_read_response(response)
 
+    async def read_all(
+        self,
+        options: ReadAllOptions | None = None,
+    ) -> AsyncIterator[ReadEvent]:
+        client = StreamsStub(channel=self.channel)
+        request = create_read_all_request(
+            options=options,
+        )
+        # TODO raise exception StreamNotFoundError
+        async for response in client.read(read_req=request):
+            yield convert_read_response(response)
+
     def subscribe_to_stream(
         self,
         stream_name: str,
         options: SubscribeToStreamOptions | None = None,
     ) -> Subscription:
         client = StreamsStub(channel=self.channel)
-        request = create_subscribe_request(
+        request = create_subscribe_to_stream_request(
             stream_name=stream_name,
             options=options,
         )
+        it = client.read(read_req=request)
+        return Subscription(it)
+
+    def subscribe_to_all(
+        self,
+        options: SubscribeToAllOptions | None = None,
+    ) -> Subscription:
+        client = StreamsStub(channel=self.channel)
+        request = create_subscribe_to_all_request(options=options)
         it = client.read(read_req=request)
         return Subscription(it)
 
