@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from uuid import UUID
-
 from eventstoredb.generated.event_store.client import Empty, StreamIdentifier
 from eventstoredb.generated.event_store.client.streams import (
     ReadReq,
@@ -13,21 +11,19 @@ from eventstoredb.generated.event_store.client.streams import (
     ReadReqOptionsStreamOptions,
     ReadReqOptionsSubscriptionOptions,
     ReadReqOptionsUuidOption,
-    ReadRespSubscriptionConfirmation,
 )
 from eventstoredb.streams.subscribe.types import (
     SubscribeToAllOptions,
     SubscribeToStreamOptions,
-    SubscriptionConfirmation,
 )
 from eventstoredb.streams.types import (
-    AllPosition,
     EventTypeFilter,
     ExcludeSystemEventsFilter,
     StreamNameFilter,
     StreamPosition,
     StreamRevision,
 )
+from eventstoredb.types import Position
 
 
 def create_read_request_options_common(
@@ -76,10 +72,14 @@ def create_subscribe_to_all_request(
 
     request_options.all = ReadReqOptionsAllOptions()
 
-    if isinstance(options.from_position, AllPosition):
+    if isinstance(options.from_position, Position):
         request_options.all.position = ReadReqOptionsPosition()
-        request_options.all.position.commit_position = options.from_position.commit
-        request_options.all.position.prepare_position = options.from_position.prepare
+        request_options.all.position.commit_position = (
+            options.from_position.commit_position
+        )
+        request_options.all.position.prepare_position = (
+            options.from_position.prepare_position
+        )
     elif options.from_position == StreamPosition.START:
         request_options.all.start = Empty()
     elif options.from_position == StreamPosition.END:
@@ -116,9 +116,3 @@ def create_subscribe_to_all_request(
         )
 
     return ReadReq(options=request_options)
-
-
-def convert_read_response_confirmation(
-    message: ReadRespSubscriptionConfirmation,
-) -> SubscriptionConfirmation:
-    return SubscriptionConfirmation(id=UUID(message.subscription_id))

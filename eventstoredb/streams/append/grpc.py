@@ -78,8 +78,8 @@ def convert_append_response_success(message: AppendRespSuccess) -> AppendResult:
     position_type, _ = betterproto.which_one_of(message, "position_option")
     if position_type == "position":
         position = Position(
-            commit=message.position.commit_position,
-            prepare=message.position.prepare_position,
+            commit_position=message.position.commit_position,
+            prepare_position=message.position.prepare_position,
         )
     else:
         position = None

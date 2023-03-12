@@ -9,7 +9,6 @@ from eventstoredb.events import (
     BinaryRecordedEvent,
     ContentType,
     JsonRecordedEvent,
-    Position,
     ReadEvent,
 )
 from eventstoredb.generated.event_store.client import Empty, StreamIdentifier
@@ -24,8 +23,10 @@ from eventstoredb.generated.event_store.client.streams import (
     ReadReqOptionsStreamOptions,
     ReadReqOptionsUuidOption,
     ReadResp,
+    ReadRespCheckpoint,
     ReadRespReadEvent,
     ReadRespReadEventRecordedEvent,
+    ReadRespSubscriptionConfirmation,
 )
 from eventstoredb.streams.read.exceptions import StreamNotFoundError
 from eventstoredb.streams.read.types import (
@@ -36,7 +37,13 @@ from eventstoredb.streams.read.types import (
     ReadStreamOptions,
     StreamNameFilter,
 )
-from eventstoredb.streams.types import AllPosition, StreamPosition, StreamRevision
+from eventstoredb.streams.types import (
+    Checkpoint,
+    StreamPosition,
+    StreamRevision,
+    SubscriptionConfirmation,
+)
+from eventstoredb.types import Position
 
 
 def create_read_request_options_common(
@@ -87,10 +94,14 @@ def create_read_all_request(options: ReadAllOptions | None = None) -> ReadReq:
 
     request_options.all = ReadReqOptionsAllOptions()
 
-    if isinstance(options.from_position, AllPosition):
+    if isinstance(options.from_position, Position):
         request_options.all.position = ReadReqOptionsPosition()
-        request_options.all.position.commit_position = options.from_position.commit
-        request_options.all.position.prepare_position = options.from_position.prepare
+        request_options.all.position.commit_position = (
+            options.from_position.commit_position
+        )
+        request_options.all.position.prepare_position = (
+            options.from_position.prepare_position
+        )
     elif options.from_position == StreamPosition.START:
         request_options.all.start = Empty()
     elif options.from_position == StreamPosition.END:
@@ -123,17 +134,23 @@ def create_read_all_request(options: ReadAllOptions | None = None) -> ReadReq:
     return ReadReq(options=request_options)
 
 
-def convert_read_response(message: ReadResp) -> ReadEvent:
+def convert_read_response(
+    message: ReadResp,
+) -> ReadEvent | SubscriptionConfirmation | Checkpoint:
     content_type, _ = betterproto.which_one_of(message, "content")
-    if content_type == "stream_not_found":
+    if content_type == "event":
+        return convert_read_response_read_event(message.event)
+    elif content_type == "confirmation":
+        return convert_read_response_subscription_confirmation(message.confirmation)
+    elif content_type == "checkpoint":
+        return convert_read_response_checkpoint(message.checkpoint)
+    elif content_type == "stream_not_found":
         raise StreamNotFoundError(
             stream_name=message.stream_not_found.stream_identifier.stream_name.decode()
         )
-    elif content_type == "event":
-        return convert_read_response_read_event(message.event)
     else:
         # FIXME maybe we should raise something like "UnexpectedRuntimeError" here?
-        raise Exception("i shouldnt be here")
+        raise Exception(f"i shouldnt be here {content_type=} {message=}")
 
 
 def convert_read_response_read_event(message: ReadRespReadEvent) -> ReadEvent:
@@ -155,8 +172,8 @@ def convert_read_response_recorded_event(
     id = UUID(message.id.string)
     content_type = ContentType(message.metadata["content-type"])
     position = Position(
-        commit=message.commit_position,
-        prepare=message.prepare_position,
+        commit_position=message.commit_position,
+        prepare_position=message.prepare_position,
     )
     event_class: Type[JsonRecordedEvent] | Type[BinaryRecordedEvent]
     if content_type == ContentType.JSON:
@@ -173,4 +190,17 @@ def convert_read_response_recorded_event(
         position=position,
         data=message.data if message.data else None,
         metadata=message.custom_metadata if message.custom_metadata else None,
+    )
+
+
+def convert_read_response_subscription_confirmation(
+    message: ReadRespSubscriptionConfirmation,
+) -> SubscriptionConfirmation:
+    return SubscriptionConfirmation(id=UUID(message.subscription_id))
+
+
+def convert_read_response_checkpoint(message: ReadRespCheckpoint) -> Checkpoint:
+    return Checkpoint(
+        commit_position=message.commit_position,
+        prepare_position=message.prepare_position,
     )

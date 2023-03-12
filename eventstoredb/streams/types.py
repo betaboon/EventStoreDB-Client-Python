@@ -2,6 +2,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from enum import Enum, auto
+from uuid import UUID
+
+from eventstoredb.types import Position
 
 StreamRevision = int
 
@@ -12,9 +15,8 @@ class StreamPosition(Enum):
 
 
 @dataclass
-class AllPosition:
-    commit: int
-    prepare: int
+class Checkpoint(Position):
+    ...
 
 
 @dataclass
@@ -32,3 +34,8 @@ class EventTypeFilter:
 class StreamNameFilter:
     regex: str | None = None
     prefix: list[str] | None = None
+
+
+@dataclass
+class SubscriptionConfirmation:
+    id: UUID
