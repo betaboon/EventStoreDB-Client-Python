@@ -21,13 +21,13 @@ from eventstoredb.streams.subscribe.types import (
     SubscriptionConfirmation,
 )
 from eventstoredb.streams.types import (
-    AllPosition,
     EventTypeFilter,
     ExcludeSystemEventsFilter,
     StreamNameFilter,
     StreamPosition,
     StreamRevision,
 )
+from eventstoredb.types import Position
 
 
 def create_read_request_options_common(
@@ -76,10 +76,14 @@ def create_subscribe_to_all_request(
 
     request_options.all = ReadReqOptionsAllOptions()
 
-    if isinstance(options.from_position, AllPosition):
+    if isinstance(options.from_position, Position):
         request_options.all.position = ReadReqOptionsPosition()
-        request_options.all.position.commit_position = options.from_position.commit
-        request_options.all.position.prepare_position = options.from_position.prepare
+        request_options.all.position.commit_position = (
+            options.from_position.commit_position
+        )
+        request_options.all.position.prepare_position = (
+            options.from_position.prepare_position
+        )
     elif options.from_position == StreamPosition.START:
         request_options.all.start = Empty()
     elif options.from_position == StreamPosition.END:

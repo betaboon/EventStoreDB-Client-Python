@@ -9,7 +9,6 @@ from eventstoredb.events import (
     BinaryRecordedEvent,
     ContentType,
     JsonRecordedEvent,
-    Position,
     ReadEvent,
 )
 from eventstoredb.generated.event_store.client import Empty, StreamIdentifier
@@ -36,7 +35,8 @@ from eventstoredb.streams.read.types import (
     ReadStreamOptions,
     StreamNameFilter,
 )
-from eventstoredb.streams.types import AllPosition, StreamPosition, StreamRevision
+from eventstoredb.streams.types import StreamPosition, StreamRevision
+from eventstoredb.types import Position
 
 
 def create_read_request_options_common(
@@ -87,10 +87,14 @@ def create_read_all_request(options: ReadAllOptions | None = None) -> ReadReq:
 
     request_options.all = ReadReqOptionsAllOptions()
 
-    if isinstance(options.from_position, AllPosition):
+    if isinstance(options.from_position, Position):
         request_options.all.position = ReadReqOptionsPosition()
-        request_options.all.position.commit_position = options.from_position.commit
-        request_options.all.position.prepare_position = options.from_position.prepare
+        request_options.all.position.commit_position = (
+            options.from_position.commit_position
+        )
+        request_options.all.position.prepare_position = (
+            options.from_position.prepare_position
+        )
     elif options.from_position == StreamPosition.START:
         request_options.all.start = Empty()
     elif options.from_position == StreamPosition.END:
@@ -155,8 +159,8 @@ def convert_read_response_recorded_event(
     id = UUID(message.id.string)
     content_type = ContentType(message.metadata["content-type"])
     position = Position(
-        commit=message.commit_position,
-        prepare=message.prepare_position,
+        commit_position=message.commit_position,
+        prepare_position=message.prepare_position,
     )
     event_class: Type[JsonRecordedEvent] | Type[BinaryRecordedEvent]
     if content_type == ContentType.JSON:

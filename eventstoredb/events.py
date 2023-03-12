@@ -5,11 +5,7 @@ from enum import Enum
 from typing import Literal
 from uuid import UUID, uuid4
 
-
-@dataclass
-class Position:
-    commit: int
-    prepare: int
+from eventstoredb.types import Position
 
 
 class ContentType(str, Enum):

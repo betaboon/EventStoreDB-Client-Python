@@ -12,12 +12,6 @@ class StreamPosition(Enum):
 
 
 @dataclass
-class AllPosition:
-    commit: int
-    prepare: int
-
-
-@dataclass
 class ExcludeSystemEventsFilter:
     ...
 

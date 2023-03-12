@@ -10,7 +10,7 @@ from eventstoredb.streams.read import (
     ReadDirection,
     StreamNameFilter,
 )
-from eventstoredb.streams.types import AllPosition, StreamPosition
+from eventstoredb.streams.types import StreamPosition
 
 
 async def test_read_all(eventstoredb_client: Client) -> None:
@@ -123,12 +123,7 @@ async def test_read_all_from_position(eventstoredb_client: Client) -> None:
     )
 
     it = eventstoredb_client.read_all(
-        options=ReadAllOptions(
-            from_position=AllPosition(
-                commit=marker.position.commit,
-                prepare=marker.position.prepare,
-            )
-        )
+        options=ReadAllOptions(from_position=marker.position)
     )
     # read all events and filter out all system events (starting with '$')
     events = [e async for e in it if e.event and not e.event.type.startswith("$")]
@@ -212,10 +207,7 @@ async def test_read_all_backwards_from_position(eventstoredb_client: Client) -> 
 
     it = eventstoredb_client.read_all(
         options=ReadAllOptions(
-            from_position=AllPosition(
-                commit=marker.position.commit,
-                prepare=marker.position.prepare,
-            ),
+            from_position=marker.position,
             direction=ReadDirection.BACKWARDS,
             max_count=2,
         )

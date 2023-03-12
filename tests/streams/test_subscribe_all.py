@@ -9,7 +9,6 @@ from eventstoredb import Client
 from eventstoredb.events import JsonEvent
 from eventstoredb.streams.subscribe import SubscribeToAllOptions
 from eventstoredb.streams.types import (
-    AllPosition,
     EventTypeFilter,
     ExcludeSystemEventsFilter,
     StreamNameFilter,
@@ -166,12 +165,7 @@ async def test_subscribe_to_all_from_position(
     )
 
     subscription = eventstoredb_client.subscribe_to_all(
-        options=SubscribeToAllOptions(
-            from_position=AllPosition(
-                commit=marker.position.commit,
-                prepare=marker.position.prepare,
-            )
-        )
+        options=SubscribeToAllOptions(from_position=marker.position)
     )
 
     subscriber.subscription = subscription

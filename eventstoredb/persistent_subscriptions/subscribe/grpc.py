@@ -9,7 +9,6 @@ from eventstoredb.events import (  # noqa: F401
     BinaryRecordedEvent,
     ContentType,
     JsonRecordedEvent,
-    Position,
     RecordedEvent,
 )
 from eventstoredb.generated.event_store.client import Empty, StreamIdentifier, Uuid
@@ -31,6 +30,7 @@ from eventstoredb.persistent_subscriptions.subscribe.types import (
     PersistentSubscriptionEvent,
     SubscribeToPersistentSubscriptionOptions,
 )
+from eventstoredb.types import Position
 
 
 def create_read_request(
@@ -124,8 +124,8 @@ def convert_read_response_recorded_event(
     id = UUID(message.id.string)
     content_type = ContentType(message.metadata["content-type"])
     position = Position(
-        commit=message.commit_position,
-        prepare=message.prepare_position,
+        commit_position=message.commit_position,
+        prepare_position=message.prepare_position,
     )
     event_class: Type[JsonRecordedEvent] | Type[BinaryRecordedEvent]
     if content_type == ContentType.JSON:

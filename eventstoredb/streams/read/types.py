@@ -4,13 +4,13 @@ from dataclasses import dataclass
 from enum import Enum, auto
 
 from eventstoredb.streams.types import (
-    AllPosition,
     EventTypeFilter,
     ExcludeSystemEventsFilter,
     StreamNameFilter,
     StreamPosition,
     StreamRevision,
 )
+from eventstoredb.types import Position
 
 
 class ReadDirection(Enum):
@@ -28,7 +28,7 @@ class ReadStreamOptions:
 
 @dataclass
 class ReadAllOptions:
-    from_position: StreamPosition | AllPosition = StreamPosition.START
+    from_position: StreamPosition | Position = StreamPosition.START
     max_count: int = 2**64 - 1  # max-uint64
     direction: ReadDirection = ReadDirection.FORWARDS
     resolve_links: bool = False

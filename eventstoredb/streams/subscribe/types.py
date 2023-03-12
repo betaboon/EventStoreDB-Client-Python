@@ -4,13 +4,13 @@ from dataclasses import dataclass
 from uuid import UUID
 
 from eventstoredb.streams.types import (
-    AllPosition,
     EventTypeFilter,
     ExcludeSystemEventsFilter,
     StreamNameFilter,
     StreamPosition,
     StreamRevision,
 )
+from eventstoredb.types import Position
 
 
 @dataclass
@@ -21,7 +21,7 @@ class SubscribeToStreamOptions:
 
 @dataclass
 class SubscribeToAllOptions:
-    from_position: StreamPosition | AllPosition = StreamPosition.START
+    from_position: StreamPosition | Position = StreamPosition.START
     resolve_links: bool = False
     filter: ExcludeSystemEventsFilter | EventTypeFilter | StreamNameFilter | None = None
     max_search_window: int | None = None
