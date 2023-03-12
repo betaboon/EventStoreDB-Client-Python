@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from uuid import UUID
-
 from eventstoredb.generated.event_store.client import Empty, StreamIdentifier
 from eventstoredb.generated.event_store.client.streams import (
     ReadReq,
@@ -13,12 +11,10 @@ from eventstoredb.generated.event_store.client.streams import (
     ReadReqOptionsStreamOptions,
     ReadReqOptionsSubscriptionOptions,
     ReadReqOptionsUuidOption,
-    ReadRespSubscriptionConfirmation,
 )
 from eventstoredb.streams.subscribe.types import (
     SubscribeToAllOptions,
     SubscribeToStreamOptions,
-    SubscriptionConfirmation,
 )
 from eventstoredb.streams.types import (
     EventTypeFilter,
@@ -120,9 +116,3 @@ def create_subscribe_to_all_request(
         )
 
     return ReadReq(options=request_options)
-
-
-def convert_read_response_confirmation(
-    message: ReadRespSubscriptionConfirmation,
-) -> SubscriptionConfirmation:
-    return SubscriptionConfirmation(id=UUID(message.subscription_id))

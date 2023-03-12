@@ -23,8 +23,10 @@ from eventstoredb.generated.event_store.client.streams import (
     ReadReqOptionsStreamOptions,
     ReadReqOptionsUuidOption,
     ReadResp,
+    ReadRespCheckpoint,
     ReadRespReadEvent,
     ReadRespReadEventRecordedEvent,
+    ReadRespSubscriptionConfirmation,
 )
 from eventstoredb.streams.read.exceptions import StreamNotFoundError
 from eventstoredb.streams.read.types import (
@@ -35,7 +37,12 @@ from eventstoredb.streams.read.types import (
     ReadStreamOptions,
     StreamNameFilter,
 )
-from eventstoredb.streams.types import StreamPosition, StreamRevision
+from eventstoredb.streams.types import (
+    Checkpoint,
+    StreamPosition,
+    StreamRevision,
+    SubscriptionConfirmation,
+)
 from eventstoredb.types import Position
 
 
@@ -127,17 +134,23 @@ def create_read_all_request(options: ReadAllOptions | None = None) -> ReadReq:
     return ReadReq(options=request_options)
 
 
-def convert_read_response(message: ReadResp) -> ReadEvent:
+def convert_read_response(
+    message: ReadResp,
+) -> ReadEvent | SubscriptionConfirmation | Checkpoint:
     content_type, _ = betterproto.which_one_of(message, "content")
-    if content_type == "stream_not_found":
+    if content_type == "event":
+        return convert_read_response_read_event(message.event)
+    elif content_type == "confirmation":
+        return convert_read_response_subscription_confirmation(message.confirmation)
+    elif content_type == "checkpoint":
+        return convert_read_response_checkpoint(message.checkpoint)
+    elif content_type == "stream_not_found":
         raise StreamNotFoundError(
             stream_name=message.stream_not_found.stream_identifier.stream_name.decode()
         )
-    elif content_type == "event":
-        return convert_read_response_read_event(message.event)
     else:
         # FIXME maybe we should raise something like "UnexpectedRuntimeError" here?
-        raise Exception("i shouldnt be here")
+        raise Exception(f"i shouldnt be here {content_type=} {message=}")
 
 
 def convert_read_response_read_event(message: ReadRespReadEvent) -> ReadEvent:
@@ -177,4 +190,17 @@ def convert_read_response_recorded_event(
         position=position,
         data=message.data if message.data else None,
         metadata=message.custom_metadata if message.custom_metadata else None,
+    )
+
+
+def convert_read_response_subscription_confirmation(
+    message: ReadRespSubscriptionConfirmation,
+) -> SubscriptionConfirmation:
+    return SubscriptionConfirmation(id=UUID(message.subscription_id))
+
+
+def convert_read_response_checkpoint(message: ReadRespCheckpoint) -> Checkpoint:
+    return Checkpoint(
+        commit_position=message.commit_position,
+        prepare_position=message.prepare_position,
     )

@@ -46,7 +46,6 @@ from eventstoredb.streams.read import (
 from eventstoredb.streams.subscribe import (
     SubscribeToAllOptions,
     SubscribeToStreamOptions,
-    Subscription,
     create_subscribe_to_all_request,
     create_subscribe_to_stream_request,
 )
@@ -99,7 +98,9 @@ class Client:
         )
         # TODO raise exception StreamNotFoundError
         async for response in client.read(read_req=request):
-            yield convert_read_response(response)
+            response_content = convert_read_response(response)
+            if isinstance(response_content, ReadEvent):
+                yield response_content
 
     async def read_all(
         self,
@@ -111,29 +112,35 @@ class Client:
         )
         # TODO raise exception StreamNotFoundError
         async for response in client.read(read_req=request):
-            yield convert_read_response(response)
+            response_content = convert_read_response(response)
+            if isinstance(response_content, ReadEvent):
+                yield response_content
 
-    def subscribe_to_stream(
+    async def subscribe_to_stream(
         self,
         stream_name: str,
         options: SubscribeToStreamOptions | None = None,
-    ) -> Subscription:
+    ) -> AsyncIterator[ReadEvent]:
         client = StreamsStub(channel=self.channel)
         request = create_subscribe_to_stream_request(
             stream_name=stream_name,
             options=options,
         )
-        it = client.read(read_req=request)
-        return Subscription(it)
+        async for response in client.read(read_req=request):
+            response_content = convert_read_response(response)
+            if isinstance(response_content, ReadEvent):
+                yield response_content
 
-    def subscribe_to_all(
+    async def subscribe_to_all(
         self,
         options: SubscribeToAllOptions | None = None,
-    ) -> Subscription:
+    ) -> AsyncIterator[ReadEvent]:
         client = StreamsStub(channel=self.channel)
         request = create_subscribe_to_all_request(options=options)
-        it = client.read(read_req=request)
-        return Subscription(it)
+        async for response in client.read(read_req=request):
+            response_content = convert_read_response(response)
+            if isinstance(response_content, ReadEvent):
+                yield response_content
 
     async def create_persistent_subscription(
         self,

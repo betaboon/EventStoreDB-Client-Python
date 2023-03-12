@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from uuid import UUID
 
 from eventstoredb.streams.types import (
     EventTypeFilter,
@@ -26,8 +25,3 @@ class SubscribeToAllOptions:
     filter: ExcludeSystemEventsFilter | EventTypeFilter | StreamNameFilter | None = None
     max_search_window: int | None = None
     checkpoint_interval: int = 1
-
-
-@dataclass
-class SubscriptionConfirmation:
-    id: UUID
