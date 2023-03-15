@@ -4,6 +4,7 @@ import asyncio
 from dataclasses import dataclass
 from operator import itemgetter
 from typing import Any, AsyncIterator, Callable, Coroutine
+from urllib.parse import quote
 
 import requests  # type: ignore
 
@@ -27,7 +28,7 @@ class EventstoreHTTP:
         return f"http://{self.host}:{self.port}"
 
     def read_stream(self, stream_name: str, event_id: int | None = None) -> Any:
-        url = f"{self.url}/streams/{stream_name}"
+        url = f"{self.url}/streams/{quote(stream_name)}"
         if event_id is not None:
             url = f"{url}/{event_id}"
         response = requests.get(

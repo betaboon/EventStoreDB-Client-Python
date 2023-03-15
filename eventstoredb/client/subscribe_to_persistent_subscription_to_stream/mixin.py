@@ -38,11 +38,15 @@ class SubscribeToPersistentSubscriptionToStreamMixin(ClientProtocol):
         if options is None:
             options = SubscribeToPersistentSubscriptionToStreamOptions()
 
-        return PersistentSubscription(
-            channel=self.channel,
+        request = create_read_request(
             stream_name=stream_name,
             group_name=group_name,
             options=options,
+        )
+
+        return PersistentSubscription(
+            channel=self.channel,
+            read_request=request,
         )
 
 
@@ -58,19 +62,12 @@ class PersistentSubscription(AsyncIterator[PersistentSubscriptionEvent]):
     def __init__(
         self,
         channel: Channel,
-        stream_name: str,
-        group_name: str,
-        options: SubscribeToPersistentSubscriptionToStreamOptions,
+        read_request: ReadReq,
     ) -> None:
         client = PersistentSubscriptionsStub(channel=channel)
-        request = create_read_request(
-            stream_name=stream_name,
-            group_name=group_name,
-            options=options,
-        )
 
         self._request_queue = RequestQueue()
-        self._request_queue.put_nowait(request)
+        self._request_queue.put_nowait(read_request)
         self._it = client.read(self._request_queue)
 
     def __aiter__(self) -> AsyncIterator[PersistentSubscriptionEvent]:

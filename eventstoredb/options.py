@@ -18,6 +18,9 @@ from eventstoredb.client.delete_persistent_subscription_to_stream.types import (
 from eventstoredb.client.read_all.types import ReadAllOptions
 from eventstoredb.client.read_stream.types import ReadStreamOptions
 from eventstoredb.client.subscribe_to_all.types import SubscribeToAllOptions
+from eventstoredb.client.subscribe_to_persistent_subscription_to_all.types import (
+    SubscribeToPersistentSubscriptionToAllOptions,
+)
 from eventstoredb.client.subscribe_to_persistent_subscription_to_stream.types import (
     NackAction,
     SubscribeToPersistentSubscriptionToStreamOptions,

@@ -81,9 +81,16 @@ def create_create_persistent_subscription_to_stream_request(
     options: CreatePersistentSubscriptionToStreamOptions,
 ) -> CreateReq:
     request_options = CreateReqOptions()
+    request_options.group_name = group_name
+
+    request_options.settings = create_persistent_subscription_request_settings(
+        settings=options.settings,
+        settings_class=CreateReqSettings,
+        consumer_strategy_class=CreateReqConsumerStrategy,
+    )
+
     request_options.stream = CreateReqStreamOptions()
     request_options.stream.stream_identifier = StreamIdentifier(stream_name.encode())
-    request_options.group_name = group_name
 
     if isinstance(options.from_revision, StreamRevision):
         request_options.stream.revision = options.from_revision
@@ -91,12 +98,6 @@ def create_create_persistent_subscription_to_stream_request(
         request_options.stream.start = Empty()
     elif options.from_revision == StreamPosition.END:
         request_options.stream.end = Empty()
-
-    request_options.settings = create_persistent_subscription_request_settings(
-        settings=options.settings,
-        settings_class=CreateReqSettings,
-        consumer_strategy_class=CreateReqConsumerStrategy,
-    )
 
     return CreateReq(options=request_options)
 
