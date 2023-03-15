@@ -21,6 +21,9 @@ from eventstoredb.client.subscribe_to_persistent_subscription_to_stream.types im
 )
 from eventstoredb.client.subscribe_to_stream.types import SubscribeToStreamOptions
 from eventstoredb.client.types import ClientOptions
+from eventstoredb.client.update_persistent_subscription_to_all.types import (
+    UpdatePersistentSubscriptionToAllOptions,
+)
 from eventstoredb.client.update_persistent_subscription_to_stream.types import (
     UpdatePersistentSubscriptionToStreamOptions,
 )

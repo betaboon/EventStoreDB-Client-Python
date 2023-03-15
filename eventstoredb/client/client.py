@@ -20,6 +20,9 @@ from eventstoredb.client.subscribe_to_persistent_subscription_to_stream.mixin im
 )
 from eventstoredb.client.subscribe_to_stream.mixin import SubscribeToStreamMixin
 from eventstoredb.client.types import ClientOptions
+from eventstoredb.client.update_persistent_subscription_to_all.mixin import (
+    UpdatePersistentSubscriptionToAllMixin,
+)
 from eventstoredb.client.update_persistent_subscription_to_stream.mixin import (
     UpdatePersistentSubscriptionToStreamMixin,
 )
@@ -36,6 +39,7 @@ class Client(
     DeletePersistentSubscriptionToStreamMixin,
     SubscribeToPersistentSubscriptionToStreamMixin,
     CreatePersistentSubscriptionToAllMixin,
+    UpdatePersistentSubscriptionToAllMixin,
 ):
     def __init__(self, options: ClientOptions | str) -> None:
         if isinstance(options, str):
