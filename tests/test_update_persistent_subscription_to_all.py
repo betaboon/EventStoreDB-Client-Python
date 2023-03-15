@@ -26,6 +26,7 @@ async def test_update_persistent_subscription_to_all(
         stream_name="$all",
         group_name=group_name,
     )
+    assert details_before is not None
     assert details_before["config"]["startPosition"] == "C:0/P:0"
 
     await eventstoredb_client.update_persistent_subscription_to_all(
@@ -39,6 +40,7 @@ async def test_update_persistent_subscription_to_all(
         stream_name="$all",
         group_name=group_name,
     )
+    assert details_after is not None
     assert details_after["config"]["startPosition"] == "C:-1/P:-1"
 
 

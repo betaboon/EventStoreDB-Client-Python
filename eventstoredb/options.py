@@ -9,6 +9,9 @@ from eventstoredb.client.create_persistent_subscription_to_all.types import (
 from eventstoredb.client.create_persistent_subscription_to_stream.types import (
     CreatePersistentSubscriptionToStreamOptions,
 )
+from eventstoredb.client.delete_persistent_subscription_to_all.types import (
+    DeletePersistentSubscriptionToAllOptions,
+)
 from eventstoredb.client.delete_persistent_subscription_to_stream.types import (
     DeletePersistentSubscriptionToStreamOptions,
 )

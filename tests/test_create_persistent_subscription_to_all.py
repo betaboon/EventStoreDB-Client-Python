@@ -48,6 +48,7 @@ async def test_create_persistent_subscription_to_all_defaults(
         stream_name="$all",
         group_name=group_name,
     )
+    assert details is not None
     c = details["config"]
     s = options.settings
     assert c["startFrom"] == 0
@@ -94,6 +95,7 @@ async def test_create_persistent_subscription_to_all_from_start(
         stream_name="$all",
         group_name=group_name,
     )
+    assert details is not None
     assert details["config"]["startPosition"] == "C:0/P:0"
 
 
@@ -113,6 +115,7 @@ async def test_create_persistent_subscription_to_all_from_end(
         stream_name="$all",
         group_name=group_name,
     )
+    assert details is not None
     assert details["config"]["startPosition"] == "C:-1/P:-1"
 
 
@@ -134,6 +137,7 @@ async def test_create_persistent_subscription_to_all_from_position(
         stream_name="$all",
         group_name=group_name,
     )
+    assert details is not None
     assert (
         details["config"]["startPosition"]
         == f"C:{marker.position.commit_position}/P:{marker.position.prepare_position}"

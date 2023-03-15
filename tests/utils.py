@@ -51,10 +51,12 @@ class EventstoreHTTP:
 
     def get_persistent_subscription_details(
         self, stream_name: str, group_name: str
-    ) -> Any:
+    ) -> Any | None:
         url = f"{self.url}/subscriptions/{stream_name}/{group_name}/info"
         response = requests.get(url=url)
-        return response.json()
+        if response.status_code == 200:
+            return response.json()
+        return None
 
 
 class Consumer:

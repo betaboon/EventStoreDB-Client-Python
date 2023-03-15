@@ -47,6 +47,7 @@ async def test_create_persistent_subscription_to_stream_defaults(
         stream_name=stream_name,
         group_name=group_name,
     )
+    assert details is not None
     c = details["config"]
     s = options.settings
     assert c["startFrom"] == 0
@@ -81,6 +82,7 @@ async def test_create_persistent_subscription_to_stream_from_start(
         stream_name=stream_name,
         group_name=group_name,
     )
+    assert details is not None
     assert details["config"]["startFrom"] == 0
 
 
@@ -102,6 +104,7 @@ async def test_create_persistent_subscription_to_stream_from_end(
         stream_name=stream_name,
         group_name=group_name,
     )
+    assert details is not None
     assert details["config"]["startFrom"] == -1
 
 
@@ -120,6 +123,7 @@ async def test_create_persistent_subscription_to_stream_from_revision(
         stream_name=stream_name,
         group_name=group_name,
     )
+    assert details is not None
     assert details["config"]["startFrom"] == 123
 
 

@@ -28,6 +28,7 @@ async def test_update_persistent_subscription_to_stream(
         stream_name=stream_name,
         group_name=group_name,
     )
+    assert details_before is not None
     assert details_before["config"]["startFrom"] == 0
 
     await eventstoredb_client.update_persistent_subscription_to_stream(
@@ -42,6 +43,7 @@ async def test_update_persistent_subscription_to_stream(
         stream_name=stream_name,
         group_name=group_name,
     )
+    assert details_after is not None
     assert details_after["config"]["startFrom"] == -1
 
 
