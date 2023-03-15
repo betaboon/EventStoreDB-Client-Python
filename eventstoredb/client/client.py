@@ -3,6 +3,9 @@ from __future__ import annotations
 from grpclib.client import Channel
 
 from eventstoredb.client.append_to_stream.mixin import AppendToStreamMixin
+from eventstoredb.client.create_persistent_subscription_to_all.mixin import (
+    CreatePersistentSubscriptionToAllMixin,
+)
 from eventstoredb.client.create_persistent_subscription_to_stream.mixin import (
     CreatePersistentSubscriptionToStreamMixin,
 )
@@ -32,6 +35,7 @@ class Client(
     UpdatePersistentSubscriptionToStreamMixin,
     DeletePersistentSubscriptionToStreamMixin,
     SubscribeToPersistentSubscriptionToStreamMixin,
+    CreatePersistentSubscriptionToAllMixin,
 ):
     def __init__(self, options: ClientOptions | str) -> None:
         if isinstance(options, str):

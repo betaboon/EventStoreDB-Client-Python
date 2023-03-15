@@ -3,6 +3,9 @@ from eventstoredb.client.append_to_stream.types import (
     AppendExpectedRevision,
     AppendToStreamOptions,
 )
+from eventstoredb.client.create_persistent_subscription_to_all.types import (
+    CreatePersistentSubscriptionToAllOptions,
+)
 from eventstoredb.client.create_persistent_subscription_to_stream.types import (
     CreatePersistentSubscriptionToStreamOptions,
 )
