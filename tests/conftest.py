@@ -1,10 +1,11 @@
-import uuid
+from uuid import uuid4
 
 import pytest
 import requests
 from requests.exceptions import ConnectionError
 
-from eventstoredb import Client, ClientOptions
+from eventstoredb import Client
+from eventstoredb.options import ClientOptions
 
 from .utils import EventstoreHTTP
 
@@ -69,9 +70,9 @@ def eventstoredb_httpclient(eventstoredb_host, eventstoredb_port):
 
 @pytest.fixture
 def stream_name():
-    return f"test-stream-{uuid.uuid4()}"
+    return f"test-stream-{uuid4()}"
 
 
 @pytest.fixture
 def group_name():
-    return f"test-group-{uuid.uuid4()}"
+    return f"test-group-{uuid4()}"

@@ -1,208 +1,47 @@
 from __future__ import annotations
 
-from typing import AsyncGenerator, AsyncIterator, Iterable
-
 from grpclib.client import Channel
-from grpclib.exceptions import GRPCError
 
-from eventstoredb.client.options import ClientOptions
-from eventstoredb.events import EventData, ReadEvent
-from eventstoredb.generated.event_store.client.persistent_subscriptions import (
-    PersistentSubscriptionsStub,
+from eventstoredb.client.append_to_stream.mixin import AppendToStreamMixin
+from eventstoredb.client.create_persistent_subscription_to_stream.mixin import (
+    CreatePersistentSubscriptionToStreamMixin,
 )
-from eventstoredb.generated.event_store.client.streams import StreamsStub
-from eventstoredb.persistent_subscriptions.common import convert_grpc_error_to_exception
-from eventstoredb.persistent_subscriptions.create import (
-    CreatePersistentSubscriptionOptions,
-    create_create_request,
+from eventstoredb.client.delete_persistent_subscription_to_stream.mixin import (
+    DeletePersistentSubscriptionToStreamMixin,
 )
-from eventstoredb.persistent_subscriptions.delete import (
-    DeletePersistentSubscriptionOptions,
-    create_delete_request,
+from eventstoredb.client.read_all.mixin import ReadAllMixin
+from eventstoredb.client.read_stream.mixin import ReadStreamMixin
+from eventstoredb.client.subscribe_to_all.mixin import SubscribeToAllMixin
+from eventstoredb.client.subscribe_to_persistent_subscription_to_stream.mixin import (
+    SubscribeToPersistentSubscriptionToStreamMixin,
 )
-from eventstoredb.persistent_subscriptions.subscribe import (
-    PersistentSubscription,
-    SubscribeToPersistentSubscriptionOptions,
-)
-from eventstoredb.persistent_subscriptions.update import (
-    UpdatePersistentSubscriptionOptions,
-    create_update_request,
-)
-from eventstoredb.streams.append import (
-    AppendReq,
-    AppendResult,
-    AppendToStreamOptions,
-    convert_append_response,
-    create_append_header,
-    create_append_request,
-)
-from eventstoredb.streams.read import (
-    ReadAllOptions,
-    ReadStreamOptions,
-    convert_read_response,
-    create_read_all_request,
-    create_read_request,
-)
-from eventstoredb.streams.subscribe import (
-    SubscribeToAllOptions,
-    SubscribeToStreamOptions,
-    create_subscribe_to_all_request,
-    create_subscribe_to_stream_request,
+from eventstoredb.client.subscribe_to_stream.mixin import SubscribeToStreamMixin
+from eventstoredb.client.types import ClientOptions
+from eventstoredb.client.update_persistent_subscription_to_stream.mixin import (
+    UpdatePersistentSubscriptionToStreamMixin,
 )
 
 
-class Client:
+class Client(
+    ReadStreamMixin,
+    AppendToStreamMixin,
+    SubscribeToStreamMixin,
+    ReadAllMixin,
+    SubscribeToAllMixin,
+    CreatePersistentSubscriptionToStreamMixin,
+    UpdatePersistentSubscriptionToStreamMixin,
+    DeletePersistentSubscriptionToStreamMixin,
+    SubscribeToPersistentSubscriptionToStreamMixin,
+):
     def __init__(self, options: ClientOptions | str) -> None:
         if isinstance(options, str):
-            self.options = ClientOptions.from_connection_string(options)
+            self._options = ClientOptions.from_connection_string(options)
         else:
-            self.options = options
+            self._options = options
         self._channel: Channel | None = None
 
     @property
     def channel(self) -> Channel:
         if self._channel is None:
-            self._channel = Channel(host=self.options.host, port=self.options.port)
+            self._channel = Channel(host=self._options.host, port=self._options.port)
         return self._channel
-
-    async def append_to_stream(
-        self,
-        stream_name: str,
-        events: EventData | Iterable[EventData],
-        options: AppendToStreamOptions | None = None,
-    ) -> AppendResult:
-        async def request_iterator() -> AsyncGenerator[AppendReq, None]:
-            yield create_append_header(
-                stream_name=stream_name,
-                options=options,
-            )
-            if isinstance(events, EventData):
-                yield create_append_request(events)
-            else:
-                for event in events:
-                    yield create_append_request(event)
-
-        client = StreamsStub(channel=self.channel)
-        response = await client.append(request_iterator())
-        return convert_append_response(stream_name, response)
-
-    async def read_stream(
-        self,
-        stream_name: str,
-        options: ReadStreamOptions | None = None,
-    ) -> AsyncIterator[ReadEvent]:
-        client = StreamsStub(channel=self.channel)
-        request = create_read_request(
-            stream_name=stream_name,
-            options=options,
-        )
-        # TODO raise exception StreamNotFoundError
-        async for response in client.read(read_req=request):
-            response_content = convert_read_response(response)
-            if isinstance(response_content, ReadEvent):
-                yield response_content
-
-    async def read_all(
-        self,
-        options: ReadAllOptions | None = None,
-    ) -> AsyncIterator[ReadEvent]:
-        client = StreamsStub(channel=self.channel)
-        request = create_read_all_request(
-            options=options,
-        )
-        # TODO raise exception StreamNotFoundError
-        async for response in client.read(read_req=request):
-            response_content = convert_read_response(response)
-            if isinstance(response_content, ReadEvent):
-                yield response_content
-
-    async def subscribe_to_stream(
-        self,
-        stream_name: str,
-        options: SubscribeToStreamOptions | None = None,
-    ) -> AsyncIterator[ReadEvent]:
-        client = StreamsStub(channel=self.channel)
-        request = create_subscribe_to_stream_request(
-            stream_name=stream_name,
-            options=options,
-        )
-        async for response in client.read(read_req=request):
-            response_content = convert_read_response(response)
-            if isinstance(response_content, ReadEvent):
-                yield response_content
-
-    async def subscribe_to_all(
-        self,
-        options: SubscribeToAllOptions | None = None,
-    ) -> AsyncIterator[ReadEvent]:
-        client = StreamsStub(channel=self.channel)
-        request = create_subscribe_to_all_request(options=options)
-        async for response in client.read(read_req=request):
-            response_content = convert_read_response(response)
-            if isinstance(response_content, ReadEvent):
-                yield response_content
-
-    async def create_persistent_subscription(
-        self,
-        stream_name: str,
-        group_name: str,
-        options: CreatePersistentSubscriptionOptions | None = None,
-    ) -> None:
-        client = PersistentSubscriptionsStub(channel=self.channel)
-        request = create_create_request(
-            stream_name=stream_name,
-            group_name=group_name,
-            options=options,
-        )
-        try:
-            await client.create(create_req=request)
-        except GRPCError as e:
-            raise convert_grpc_error_to_exception(e)
-
-    async def update_persistent_subscription(
-        self,
-        stream_name: str,
-        group_name: str,
-        options: UpdatePersistentSubscriptionOptions | None = None,
-    ) -> None:
-        client = PersistentSubscriptionsStub(channel=self.channel)
-        request = create_update_request(
-            stream_name=stream_name,
-            group_name=group_name,
-            options=options,
-        )
-        try:
-            await client.update(update_req=request)
-        except GRPCError as e:
-            raise convert_grpc_error_to_exception(e)
-
-    async def delete_persistent_subscription(
-        self,
-        stream_name: str,
-        group_name: str,
-        options: DeletePersistentSubscriptionOptions | None = None,
-    ) -> None:
-        client = PersistentSubscriptionsStub(channel=self.channel)
-        request = create_delete_request(
-            stream_name=stream_name,
-            group_name=group_name,
-            options=options,
-        )
-        try:
-            await client.delete(delete_req=request)
-        except GRPCError as e:
-            raise convert_grpc_error_to_exception(e)
-
-    def subscribe_to_persistent_subscription(
-        self,
-        stream_name: str,
-        group_name: str,
-        options: SubscribeToPersistentSubscriptionOptions | None = None,
-    ) -> PersistentSubscription:
-        client = PersistentSubscriptionsStub(channel=self.channel)
-        return PersistentSubscription(
-            client=client,
-            stream_name=stream_name,
-            group_name=group_name,
-            options=options,
-        )

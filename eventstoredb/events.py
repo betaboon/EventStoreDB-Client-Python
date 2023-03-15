@@ -5,7 +5,7 @@ from enum import Enum
 from typing import Literal
 from uuid import UUID, uuid4
 
-from eventstoredb.types import Position
+from eventstoredb.types import AllPosition, Position, StreamRevision
 
 
 class ContentType(str, Enum):
@@ -38,9 +38,9 @@ class RecordedEvent:
     id: UUID
     type: str
     content_type: ContentType
-    revision: int
+    revision: StreamRevision
     created: int
-    position: Position
+    position: AllPosition
     data: bytes | None
     metadata: bytes | None
 
@@ -55,9 +55,13 @@ class BinaryRecordedEvent(RecordedEvent):
     ...
 
 
-# TODO does this belong to streams/read/types?
 @dataclass
 class ReadEvent:
     event: RecordedEvent | None = None
     link: RecordedEvent | None = None
-    commit_position: int | None = None
+    commit_position: Position | None = None
+
+
+@dataclass
+class PersistentSubscriptionEvent(ReadEvent):
+    retry_count: int | None = None
