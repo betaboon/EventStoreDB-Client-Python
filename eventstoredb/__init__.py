@@ -1,1 +1,1 @@
-from eventstoredb.client import Client, ClientOptions
+from eventstoredb.client.client import Client
