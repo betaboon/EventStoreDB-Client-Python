@@ -11,13 +11,15 @@ from eventstoredb.client.subscribe_to_stream.types import SubscribeToStreamOptio
 from eventstoredb.events import ReadEvent
 from eventstoredb.generated.event_store.client.streams import StreamsStub
 
+Subscription = AsyncIterator[ReadEvent]
+
 
 class SubscribeToStreamMixin(ClientProtocol):
     async def subscribe_to_stream(
         self,
         stream_name: str,
         options: SubscribeToStreamOptions | None = None,
-    ) -> AsyncIterator[ReadEvent]:
+    ) -> Subscription:
         if options is None:
             options = SubscribeToStreamOptions()
 
