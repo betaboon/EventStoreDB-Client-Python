@@ -7,7 +7,9 @@ from eventstoredb.client.create_persistent_subscription_to_all.types import (
     CreatePersistentSubscriptionToAllOptions,
 )
 from eventstoredb.client.create_persistent_subscription_to_stream.types import (
+    ConsumerStrategy,
     CreatePersistentSubscriptionToStreamOptions,
+    PersistentSubscriptionSettings,
 )
 from eventstoredb.client.delete_persistent_subscription_to_all.types import (
     DeletePersistentSubscriptionToAllOptions,
