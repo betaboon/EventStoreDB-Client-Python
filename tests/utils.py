@@ -3,12 +3,13 @@ from __future__ import annotations
 import asyncio
 from dataclasses import dataclass
 from operator import itemgetter
-from typing import Any, AsyncIterator, Callable, Coroutine
+from typing import Any, Callable, Coroutine
 from urllib.parse import quote
 
 import requests  # type: ignore
 
 from eventstoredb.events import JsonEvent, ReadEvent
+from eventstoredb.subscriptions import PersistentSubscription, Subscription
 
 
 def json_test_events(amount: int) -> list[JsonEvent]:
@@ -63,7 +64,7 @@ class EventstoreHTTP:
 class Consumer:
     def __init__(
         self,
-        it: AsyncIterator[ReadEvent],
+        it: Subscription | PersistentSubscription,
         on_event: Callable[[Any], Coroutine[Any, Any, None]] | None = None,
     ) -> None:
         self.events: list[ReadEvent] = []
