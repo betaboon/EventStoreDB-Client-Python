@@ -63,5 +63,15 @@ class ReadEvent:
 
 
 @dataclass
+class CaughtUp:
+    ...
+
+
+@dataclass
+class FellBehind:
+    ...
+
+
+@dataclass
 class PersistentSubscriptionEvent(ReadEvent):
     retry_count: int | None = None

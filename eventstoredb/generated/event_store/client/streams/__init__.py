@@ -133,6 +133,18 @@ class ReadResp(betterproto.Message):
     last_all_stream_position: "__client__.AllStreamPosition" = (
         betterproto.message_field(7, group="content")
     )
+    caught_up: "ReadRespCaughtUp" = betterproto.message_field(8, group="content")
+    fell_behind: "ReadRespFellBehind" = betterproto.message_field(9, group="content")
+
+
+@dataclass(eq=False, repr=False)
+class ReadRespCaughtUp(betterproto.Message):
+    pass
+
+
+@dataclass(eq=False, repr=False)
+class ReadRespFellBehind(betterproto.Message):
+    pass
 
 
 @dataclass(eq=False, repr=False)

@@ -7,7 +7,7 @@ from eventstoredb.client.subscribe_to_stream.grpc import (
     convert_subscribe_to_stream_response,
 )
 from eventstoredb.client.subscribe_to_stream.types import SubscriptionConfirmation
-from eventstoredb.events import ReadEvent
+from eventstoredb.events import CaughtUp, FellBehind, ReadEvent
 from eventstoredb.filters import (
     EventTypeFilter,
     ExcludeSystemEventsFilter,
@@ -84,7 +84,7 @@ def create_subscribe_to_all_request(options: SubscribeToAllOptions) -> ReadReq:
 
 def convert_subscribe_to_all_response(
     message: ReadResp,
-) -> ReadEvent | SubscriptionConfirmation | Checkpoint:
+) -> ReadEvent | CaughtUp | FellBehind | SubscriptionConfirmation | Checkpoint:
     content_type, _ = betterproto.which_one_of(message, "content")
 
     if content_type == "checkpoint":

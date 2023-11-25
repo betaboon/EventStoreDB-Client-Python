@@ -1,7 +1,7 @@
 import asyncio
 
 from eventstoredb import Client
-from eventstoredb.events import JsonEvent
+from eventstoredb.events import CaughtUp, JsonEvent, ReadEvent
 from eventstoredb.options import StreamPosition, SubscribeToStreamOptions
 
 from .utils import Consumer, json_test_events
@@ -23,7 +23,9 @@ async def test_subscribe_to_stream_json(
 
     await consumer.stop(1)
 
-    assert len(consumer.events) == 1
+    events = [e for e in consumer.events if type(e) is ReadEvent]
+
+    assert len(events) == 1
 
 
 async def test_subscribe_to_stream_from_start(
@@ -44,7 +46,9 @@ async def test_subscribe_to_stream_from_start(
     await consumer.start()
     await asyncio.sleep(1)
 
-    assert len(consumer.events) == 4
+    events = [e for e in consumer.events if type(e) is ReadEvent]
+
+    assert len(events) == 4
 
     await eventstoredb_client.append_to_stream(
         stream_name=stream_name,
@@ -53,7 +57,9 @@ async def test_subscribe_to_stream_from_start(
 
     await consumer.stop(1)
 
-    assert len(consumer.events) == 5
+    events = [e for e in consumer.events if type(e) is ReadEvent]
+
+    assert len(events) == 5
 
 
 async def test_subscribe_to_stream_from_end(
@@ -80,7 +86,9 @@ async def test_subscribe_to_stream_from_end(
 
     await consumer.stop(1)
 
-    assert len(consumer.events) == 1
+    events = [e for e in consumer.events if type(e) is ReadEvent]
+
+    assert len(events) == 1
 
 
 async def test_subscribe_to_stream_from_revision(
@@ -101,7 +109,8 @@ async def test_subscribe_to_stream_from_revision(
     await consumer.start()
     await asyncio.sleep(1)
 
-    assert len(consumer.events) == 1
+    events = [e for e in consumer.events if type(e) is ReadEvent]
+    assert len(events) == 1
 
     await eventstoredb_client.append_to_stream(
         stream_name=stream_name,
@@ -110,4 +119,25 @@ async def test_subscribe_to_stream_from_revision(
 
     await consumer.stop(1)
 
+
+async def test_caught_up_event_received(
+    eventstoredb_client: Client,
+    stream_name: str,
+) -> None:
+    await eventstoredb_client.append_to_stream(
+        stream_name=stream_name,
+        events=json_test_events(1),
+    )
+
+    it = eventstoredb_client.subscribe_to_stream(
+        stream_name=stream_name,
+        options=SubscribeToStreamOptions(from_revision=StreamPosition.START),
+    )
+
+    consumer = Consumer(it)
+    await consumer.start()
+    await asyncio.sleep(1)
+    await consumer.stop()
+
     assert len(consumer.events) == 2
+    assert type(consumer.events[1]) is CaughtUp

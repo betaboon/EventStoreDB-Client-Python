@@ -9,7 +9,9 @@ from eventstoredb.client.exceptions import StreamNotFoundError
 from eventstoredb.client.read_stream.types import ReadStreamOptions
 from eventstoredb.events import (
     BinaryRecordedEvent,
+    CaughtUp,
     ContentType,
+    FellBehind,
     JsonRecordedEvent,
     ReadEvent,
 )
@@ -40,9 +42,9 @@ def create_read_request(stream_name: str, options: ReadStreamOptions) -> ReadReq
     request_options.uuid_option = ReadReqOptionsUuidOption(string=Empty())
 
     if options.direction == ReadDirection.FORWARDS:
-        request_options.read_direction = ReadReqOptionsReadDirection.Forwards
+        request_options.read_direction = ReadReqOptionsReadDirection.Forwards  # type: ignore
     elif options.direction == ReadDirection.BACKWARDS:
-        request_options.read_direction = ReadReqOptionsReadDirection.Backwards
+        request_options.read_direction = ReadReqOptionsReadDirection.Backwards  # type: ignore
 
     request_options.no_filter = Empty()
     request_options.stream = ReadReqOptionsStreamOptions()
@@ -58,10 +60,14 @@ def create_read_request(stream_name: str, options: ReadStreamOptions) -> ReadReq
     return ReadReq(options=request_options)
 
 
-def convert_read_response(message: ReadResp) -> ReadEvent:
+def convert_read_response(message: ReadResp) -> ReadEvent | CaughtUp | FellBehind:
     content_type, _ = betterproto.which_one_of(message, "content")
     if content_type == "event":
         return convert_read_response_read_event(message.event)
+    elif content_type == "caught_up":
+        return CaughtUp()
+    elif content_type == "fell_behind":
+        return FellBehind()
     elif content_type == "stream_not_found":
         raise StreamNotFoundError(
             stream_name=message.stream_not_found.stream_identifier.stream_name.decode()

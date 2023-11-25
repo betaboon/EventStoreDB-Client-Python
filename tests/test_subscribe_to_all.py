@@ -1,7 +1,7 @@
 from uuid import uuid4
 
 from eventstoredb import Client
-from eventstoredb.events import JsonEvent
+from eventstoredb.events import JsonEvent, ReadEvent
 from eventstoredb.filters import (
     EventTypeFilter,
     ExcludeSystemEventsFilter,
@@ -26,9 +26,10 @@ async def test_subscribe_to_all(eventstoredb_client: Client) -> None:
 
     await consumer.stop(1)
 
+    read_events = [e for e in consumer.events if type(e) is ReadEvent]
     events = [
         e
-        for e in consumer.events
+        for e in read_events
         if e.event is not None and e.event.type.startswith("test_subscribe_to_all_")
     ]
 
@@ -64,9 +65,10 @@ async def test_subscribe_to_all_from_start(eventstoredb_client: Client) -> None:
 
     await consumer.stop(1)
 
+    read_events = [e for e in consumer.events if type(e) is ReadEvent]
     events = [
         e
-        for e in consumer.events
+        for e in read_events
         if e.event is not None
         and e.event.type.startswith("test_subscribe_to_all_from_start_")
     ]
@@ -109,9 +111,10 @@ async def test_subscribe_to_all_from_end(eventstoredb_client: Client) -> None:
 
     await consumer.stop(1)
 
+    read_events = [e for e in consumer.events if type(e) is ReadEvent]
     events = [
         e
-        for e in consumer.events
+        for e in read_events
         if e.event is not None
         and e.event.type.startswith("test_subscribe_to_all_from_end_")
     ]
@@ -150,9 +153,10 @@ async def test_subscribe_to_all_from_position(eventstoredb_client: Client) -> No
     consumer = Consumer(it)
     await consumer.run_for(1)
 
+    read_events = [e for e in consumer.events if type(e) is ReadEvent]
     events = [
         e
-        for e in consumer.events
+        for e in read_events
         if e.event is not None and not e.event.type.startswith("$")
     ]
 
@@ -182,9 +186,10 @@ async def test_subscribe_to_all_exclude_system_events(
 
     await consumer.stop(1)
 
+    read_events = [e for e in consumer.events if type(e) is ReadEvent]
     events = [
         e
-        for e in consumer.events
+        for e in read_events
         if e.event is not None
         and (
             e.event.type.startswith("$")
@@ -222,10 +227,12 @@ async def test_subscribe_to_all_filter_by_event_type_regex(
 
     consumer = Consumer(it)
     await consumer.run_for(1)
+    read_events = [e for e in consumer.events if type(e) is ReadEvent]
+    events = [e for e in read_events]
 
-    assert len(consumer.events) == 1
-    assert consumer.events[0].event is not None
-    event = consumer.events[0].event
+    assert len(events) == 1
+    assert events[0].event is not None
+    event = events[0].event
     assert event.stream_name == stream_name
     assert event.type == "test_subscribe_to_all_filter_by_event_type_regex_Test1"
 
@@ -255,15 +262,17 @@ async def test_subscribe_to_all_filter_by_event_type_prefix(
     consumer = Consumer(it)
     await consumer.run_for(1)
 
-    assert len(consumer.events) == 2
+    read_events = [e for e in consumer.events if type(e) is ReadEvent]
+    events = [e for e in read_events]
+    assert len(events) == 2
 
-    assert consumer.events[0].event is not None
-    event = consumer.events[0].event
+    assert events[0].event is not None
+    event = events[0].event
     assert event.stream_name == stream_name
     assert event.type == "test_subscribe_to_all_filter_by_event_type_prefix_Test1"
 
-    assert consumer.events[1].event is not None
-    event = consumer.events[1].event
+    assert events[1].event is not None
+    event = events[1].event
     assert event.stream_name == stream_name
     assert event.type == "test_subscribe_to_all_filter_by_event_type_prefix_Test2"
 
@@ -290,9 +299,12 @@ async def test_subscribe_to_all_filter_by_stream_name_regex(
     consumer = Consumer(it)
     await consumer.run_for(1)
 
-    assert len(consumer.events) == 1
-    assert consumer.events[0].event is not None
-    event = consumer.events[0].event
+    read_events = [e for e in consumer.events if type(e) is ReadEvent]
+    events = [e for e in read_events]
+
+    assert len(events) == 1
+    assert events[0].event is not None
+    event = events[0].event
     assert event.stream_name == stream_name_1
     assert event.type == "Test"
 
@@ -332,14 +344,16 @@ async def test_subscribe_to_all_filter_by_stream_name_prefix(
     consumer = Consumer(it)
     await consumer.run_for(1)
 
-    assert len(consumer.events) == 2
+    read_events = [e for e in consumer.events if type(e) is ReadEvent]
+    events = [e for e in read_events]
+    assert len(events) == 2
 
-    assert consumer.events[0].event is not None
-    event = consumer.events[0].event
+    assert events[0].event is not None
+    event = events[0].event
     assert event.stream_name == stream_name_1
     assert event.type == "Test"
 
-    assert consumer.events[1].event is not None
-    event = consumer.events[1].event
+    assert events[1].event is not None
+    event = events[1].event
     assert event.stream_name == stream_name_2
     assert event.type == "Test"

@@ -36,8 +36,10 @@ async def test_read_all(eventstoredb_client: Client) -> None:
     it = eventstoredb_client.read_all()
     # read all events and filter for events with types starting with 'test_read_all_'
     # the filtering is done because the eventstore is shared across the pytest-session
+    raw_events = [e async for e in it]
+    read_events = [e for e in raw_events if type(e) is ReadEvent]
     events = [
-        e async for e in it if e.event and e.event.type.startswith("test_read_all_")
+        e for e in read_events if e.event and e.event.type.startswith("test_read_all_")
     ]
 
     assert len(events) == 2
@@ -80,9 +82,11 @@ async def test_read_all_from_start(eventstoredb_client: Client) -> None:
     )
     # read all events and filter by event-type containing the right prefix
     # the filtering is done because the eventstore is shared across the pytest-session
+    raw_events = [e async for e in it]
+    read_events = [e for e in raw_events if type(e) is ReadEvent]
     events = [
         e
-        async for e in it
+        for e in read_events
         if e.event and e.event.type.startswith("test_read_all_from_start_")
     ]
 
@@ -124,7 +128,9 @@ async def test_read_all_from_position(eventstoredb_client: Client) -> None:
         options=ReadAllOptions(from_position=marker.position)
     )
     # read all events and filter out all system events (starting with '$')
-    events = [e async for e in it if e.event and not e.event.type.startswith("$")]
+    raw_events = [e async for e in it]
+    read_events = [e for e in raw_events if type(e) is ReadEvent]
+    events = [e for e in read_events if e.event and not e.event.type.startswith("$")]
 
     # for some odd reason read_all includes the event _at_ position
     # which seems to be different than subscribe_to_all
@@ -163,9 +169,11 @@ async def test_read_all_backwards_from_end(eventstoredb_client: Client) -> None:
     )
     # read all events and filter by event-type containing the right prefix
     # the filtering is done because the eventstore is shared across the pytest-session
+    raw_events = [e async for e in it]
+    read_events = [e for e in raw_events if type(e) is ReadEvent]
     events = [
         e
-        async for e in it
+        for e in read_events
         if e.event and e.event.type.startswith("test_read_all_backwards_from_end_")
     ]
 
@@ -211,7 +219,9 @@ async def test_read_all_backwards_from_position(eventstoredb_client: Client) -> 
         )
     )
     # read all events and filter out all system events (starting with '$')
-    events = [e async for e in it if e.event and not e.event.type.startswith("$")]
+    raw_events = [e async for e in it]
+    read_events = [e for e in raw_events if type(e) is ReadEvent]
+    events = [e for e in read_events if e.event and not e.event.type.startswith("$")]
     for e in events:
         print(e)
 
@@ -241,9 +251,11 @@ async def test_read_all_exclude_system_events(eventstoredb_client: Client) -> No
         options=ReadAllOptions(filter=ExcludeSystemEventsFilter())
     )
 
+    raw_events = [e async for e in it]
+    read_events = [e for e in raw_events if type(e) is ReadEvent]
     events = [
         e
-        async for e in it
+        for e in read_events
         if e.event
         and (
             e.event.type.startswith("$")

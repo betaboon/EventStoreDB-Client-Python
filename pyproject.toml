@@ -17,27 +17,27 @@ dynamic = ["version"]
 requires-python = ">=3.9"
 dependencies = [
     "betterproto==2.0.0b5",
-    "yarl>=1.8.2",
+    "yarl>=1.9.3",
 ]
 
 [project.urls]
 repository = "https://github.com/betaboon/EventStoreDB-Client-Python"
 changelog = "https://github.com/betaboon/EventStoreDB-Client-Python/releases"
 
-[project.optional-dependencies]
 [tool.pdm.dev-dependencies]
 test = [
-    "pytest>=7.2.2",
-    "pytest-docker>=1.0.1",
-    "pytest-asyncio>=0.20.3",
-    "pytest-mock>=3.10.0",
+    "pytest>=7.4.3",
+    "pytest-docker>=2.0.1",
+    "pytest-asyncio>=0.21.1",
+    "pytest-mock>=3.12.0",
 ]
 dev = [
-    "grpcio-tools>=1.51.3",
+    "grpcio-tools>=1.59.3",
     "betterproto[compiler]==2.0.0b5",
-    "pre-commit>=3.1.1",
+    "pre-commit>=3.5.0",
     "gitlint>=0.19.1",
-    "python-semantic-release>=7.33.2",
+    "python-semantic-release>=7.33.2,<8",
+    "mypy>=1.7.1",
 ]
 
 [tool.pdm.scripts]
@@ -46,7 +46,7 @@ lint = "pre-commit run --all-files"
 test = "pytest"
 
 [tool.pdm.scripts._.env]
-EVENTSTOREDB_VERSION = "oss-v22.10.1"
+EVENTSTOREDB_VERSION = "oss-v23.10.0"
 PROTOC_IN_PATH = "./external/EventStore/src/Protos/Grpc"
 PROTOC_OUT_PATH = "./eventstoredb/generated"
 
@@ -102,13 +102,21 @@ version_source = "tag_only"
 version_pattern = "d+.d+.d+"
 tag_format = "{version}"
 
+[tool.mypy]
+strict = true
+implicit_reexport = true
+exclude = [
+  '^tests/conftest\.py$',
+  '^eventstoredb/generated/.*',
+]
+
 [tool.black]
 line-length = 88
 
 [tool.flake8]
 # Recommend matching the black line length (default 88),
 # rather than using the flake8 default of 79:
-max-line-length = 88
+max-line-length = 95
 extend-ignore = [
     # See https://github.com/PyCQA/pycodestyle/issues/373
     "E203",

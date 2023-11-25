@@ -1,19 +1,39 @@
+minimum_pre_commit_version: 3.2.0
+
+default_stages:
+  - pre-commit
+
 default_install_hook_types:
   - pre-commit
   - commit-msg
+
 repos:
   - repo: https://github.com/psf/black
-    rev: 23.1.0
+    rev: 23.11.0
     hooks:
       - id: black
   - repo: https://github.com/john-hen/Flake8-pyproject
-    rev: 1.2.2
+    rev: 1.2.3
     hooks:
       - id: Flake8-pyproject
   - repo: https://github.com/pycqa/isort
     rev: 5.12.0
     hooks:
       - id: isort
+  - repo: https://github.com/pre-commit/mirrors-mypy
+    rev: v1.7.1
+    hooks:
+      - id: mypy
+        exclude: |
+          (?x)^(
+            eventstoredb/generated/.*|
+            tests/.*
+          )$
+        args:
+          - --strict
+          - --ignore-missing-imports
+          - --implicit-reexport
+          - --follow-imports=silent
   - repo: https://github.com/jorisroovers/gitlint
     rev: v0.19.1
     hooks:

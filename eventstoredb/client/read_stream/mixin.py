@@ -8,7 +8,7 @@ from eventstoredb.client.read_stream.grpc import (
     create_read_request,
 )
 from eventstoredb.client.read_stream.types import ReadStreamOptions
-from eventstoredb.events import ReadEvent
+from eventstoredb.events import CaughtUp, FellBehind, ReadEvent
 from eventstoredb.generated.event_store.client.streams import StreamsStub
 
 
@@ -17,7 +17,7 @@ class ReadStreamMixin(ClientProtocol):
         self,
         stream_name: str,
         options: ReadStreamOptions | None = None,
-    ) -> AsyncIterator[ReadEvent]:
+    ) -> AsyncIterator[ReadEvent | CaughtUp | FellBehind]:
         if options is None:
             options = ReadStreamOptions()
 
@@ -29,6 +29,4 @@ class ReadStreamMixin(ClientProtocol):
 
         # TODO raise exception StreamNotFoundError
         async for response in client.read(read_req=request):
-            response_content = convert_read_response(response)
-            if isinstance(response_content, ReadEvent):
-                yield response_content
+            yield convert_read_response(response)

@@ -40,9 +40,10 @@ async def test_subscribe_persistent_subscription_to_all(
 
     await consumer.stop(1)
 
+    read_events = [e for e in consumer.events if type(e) is PersistentSubscriptionEvent]
     events = [
         e
-        for e in consumer.events
+        for e in read_events
         if e.event is not None
         and e.event.type.startswith("test_subscribe_persistent_subscription_to_all_")
     ]
@@ -115,9 +116,10 @@ async def test_subscribe_persistent_subscription_to_all_from_start(
 
     await consumer.stop(1)
 
+    read_events = [e for e in consumer.events if type(e) is PersistentSubscriptionEvent]
     events = [
         e
-        for e in consumer.events
+        for e in read_events
         if e.event is not None
         and e.event.type.startswith(
             "test_subscribe_persistent_subscription_to_all_from_start_"
@@ -185,9 +187,10 @@ async def test_subscribe_persistent_subscription_to_all_from_end(
 
     await consumer.stop(1)
 
+    read_events = [e for e in consumer.events if type(e) is PersistentSubscriptionEvent]
     events = [
         e
-        for e in consumer.events
+        for e in read_events
         if e.event is not None
         and e.event.type.startswith(
             "test_subscribe_persistent_subscription_to_all_from_end_"
@@ -238,9 +241,10 @@ async def test_subscribe_persistent_subscription_to_all_from_position(
     consumer = Consumer(subscription, on_event=on_event)
     await consumer.run_for(1)
 
+    read_events = [e for e in consumer.events if type(e) is PersistentSubscriptionEvent]
     events = [
         e
-        for e in consumer.events
+        for e in read_events
         if e.event is not None and not e.event.stream_name.startswith("$")
     ]
 
@@ -293,9 +297,12 @@ async def test_subscribe_persistent_subscription_to_all_filter_by_event_type_reg
     consumer = Consumer(subscription, on_event=on_event)
     await consumer.run_for(1)
 
-    assert len(consumer.events) == 1
-    assert consumer.events[0].event is not None
-    event = consumer.events[0].event
+    read_events = [e for e in consumer.events if type(e) is PersistentSubscriptionEvent]
+    events = [e for e in read_events]
+
+    assert len(events) == 1
+    assert events[0].event is not None
+    event = events[0].event
     assert event.stream_name == stream_name
     assert (
         event.type == "persistent_subscription_to_all_filter_by_event_type_regex_Test1"
@@ -338,17 +345,20 @@ async def test_subscribe_persistent_subscription_to_all_filter_by_event_type_pre
     consumer = Consumer(subscription, on_event=on_event)
     await consumer.run_for(1)
 
-    assert len(consumer.events) == 2
+    read_events = [e for e in consumer.events if type(e) is PersistentSubscriptionEvent]
+    events = [e for e in read_events]
 
-    assert consumer.events[0].event is not None
-    event = consumer.events[0].event
+    assert len(events) == 2
+
+    assert events[0].event is not None
+    event = events[0].event
     assert event.stream_name == stream_name
     assert (
         event.type == "persistent_subscription_to_all_filter_by_event_type_prefix_Test1"
     )
 
-    assert consumer.events[1].event is not None
-    event = consumer.events[1].event
+    assert events[1].event is not None
+    event = events[1].event
     assert event.stream_name == stream_name
     assert (
         event.type == "persistent_subscription_to_all_filter_by_event_type_prefix_Test2"
@@ -392,9 +402,12 @@ async def test_subscribe_persistent_subscription_to_all_filter_by_stream_name_re
     consumer = Consumer(subscription, on_event=on_event)
     await consumer.run_for(1)
 
-    assert len(consumer.events) == 1
-    assert consumer.events[0].event is not None
-    event = consumer.events[0].event
+    read_events = [e for e in consumer.events if type(e) is PersistentSubscriptionEvent]
+    events = [e for e in read_events]
+
+    assert len(events) == 1
+    assert events[0].event is not None
+    event = events[0].event
     assert event.stream_name == stream_name_1
     assert event.type == "Test"
 
@@ -438,15 +451,18 @@ async def test_subscribe_persistent_subscription_to_all_filter_by_stream_name_pr
     consumer = Consumer(subscription, on_event=on_event)
     await consumer.run_for(1)
 
-    assert len(consumer.events) == 2
+    read_events = [e for e in consumer.events if type(e) is PersistentSubscriptionEvent]
+    events = [e for e in read_events]
 
-    assert consumer.events[0].event is not None
-    event = consumer.events[0].event
+    assert len(events) == 2
+
+    assert events[0].event is not None
+    event = events[0].event
     assert event.stream_name == stream_name_1
     assert event.type == "Test"
 
-    assert consumer.events[1].event is not None
-    event = consumer.events[1].event
+    assert events[1].event is not None
+    event = events[1].event
     assert event.stream_name == stream_name_2
     assert event.type == "Test"
 

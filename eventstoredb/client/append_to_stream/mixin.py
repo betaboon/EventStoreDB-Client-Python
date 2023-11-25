@@ -27,10 +27,9 @@ class AppendToStreamMixin(ClientProtocol):
             options = AppendToStreamOptions()
 
         async def request_iterator() -> AsyncGenerator[AppendReq, None]:
-            # FIXME typing of `options`
             yield create_append_header(
                 stream_name=stream_name,
-                options=options,  # type: ignore
+                options=options,
             )
             if isinstance(events, EventData):
                 yield create_append_request(events)
