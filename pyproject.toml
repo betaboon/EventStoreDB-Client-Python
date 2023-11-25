@@ -38,6 +38,7 @@ dev = [
     "pre-commit>=3.1.1",
     "gitlint>=0.19.1",
     "python-semantic-release>=7.33.2",
+    "mypy>=1.7.1",
 ]
 
 [tool.pdm.scripts]
@@ -101,6 +102,14 @@ branch = "main"
 version_source = "tag_only"
 version_pattern = "d+.d+.d+"
 tag_format = "{version}"
+
+[tool.mypy]
+strict = true
+implicit_reexport = true
+exclude = [
+  '^tests/conftest\.py$',
+  '^eventstoredb/generated/.*',
+]
 
 [tool.black]
 line-length = 88
