@@ -3,11 +3,11 @@ default_install_hook_types:
   - commit-msg
 repos:
   - repo: https://github.com/psf/black
-    rev: 23.1.0
+    rev: 23.11.0
     hooks:
       - id: black
   - repo: https://github.com/john-hen/Flake8-pyproject
-    rev: 1.2.2
+    rev: 1.2.3
     hooks:
       - id: Flake8-pyproject
   - repo: https://github.com/pycqa/isort
