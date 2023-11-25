@@ -151,6 +151,7 @@ class MemberInfo(betterproto.Message):
     advertise_host_to_client_as: str = betterproto.string_field(18)
     advertise_http_port_to_client_as: int = betterproto.uint32_field(19)
     advertise_tcp_port_to_client_as: int = betterproto.uint32_field(20)
+    es_version: str = betterproto.string_field(21)
 
 
 @dataclass(eq=False, repr=False)

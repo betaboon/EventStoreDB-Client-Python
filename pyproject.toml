@@ -24,7 +24,6 @@ dependencies = [
 repository = "https://github.com/betaboon/EventStoreDB-Client-Python"
 changelog = "https://github.com/betaboon/EventStoreDB-Client-Python/releases"
 
-[project.optional-dependencies]
 [tool.pdm.dev-dependencies]
 test = [
     "pytest>=7.4.3",
@@ -47,7 +46,7 @@ lint = "pre-commit run --all-files"
 test = "pytest"
 
 [tool.pdm.scripts._.env]
-EVENTSTOREDB_VERSION = "oss-v22.10.1"
+EVENTSTOREDB_VERSION = "oss-v23.10.0"
 PROTOC_IN_PATH = "./external/EventStore/src/Protos/Grpc"
 PROTOC_OUT_PATH = "./eventstoredb/generated"
 
@@ -117,7 +116,7 @@ line-length = 88
 [tool.flake8]
 # Recommend matching the black line length (default 88),
 # rather than using the flake8 default of 79:
-max-line-length = 88
+max-line-length = 95
 extend-ignore = [
     # See https://github.com/PyCQA/pycodestyle/issues/373
     "E203",

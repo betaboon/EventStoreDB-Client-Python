@@ -7,7 +7,7 @@ from eventstoredb.client.subscribe_to_stream.types import (
     SubscribeToStreamOptions,
     SubscriptionConfirmation,
 )
-from eventstoredb.events import ReadEvent
+from eventstoredb.events import CaughtUp, FellBehind, ReadEvent
 from eventstoredb.generated.event_store.client import Empty, StreamIdentifier
 from eventstoredb.generated.event_store.client.streams import (
     ReadReq,
@@ -45,7 +45,7 @@ def create_subscribe_to_stream_request(
 
 def convert_subscribe_to_stream_response(
     message: ReadResp,
-) -> ReadEvent | SubscriptionConfirmation:
+) -> ReadEvent | CaughtUp | FellBehind | SubscriptionConfirmation:
     content_type, _ = betterproto.which_one_of(message, "content")
 
     if content_type == "confirmation":

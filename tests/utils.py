@@ -8,7 +8,7 @@ from urllib.parse import quote
 
 import requests  # type: ignore
 
-from eventstoredb.events import JsonEvent, ReadEvent
+from eventstoredb.events import CaughtUp, FellBehind, JsonEvent, ReadEvent
 from eventstoredb.subscriptions import PersistentSubscription, Subscription
 
 
@@ -67,7 +67,7 @@ class Consumer:
         it: Subscription | PersistentSubscription,
         on_event: Callable[[Any], Coroutine[Any, Any, None]] | None = None,
     ) -> None:
-        self.events: list[ReadEvent] = []
+        self.events: list[ReadEvent | CaughtUp | FellBehind] = []
         self._it = it
         self._on_event = on_event
         self._task: asyncio.Task[Any] | None = None

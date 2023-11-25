@@ -44,9 +44,10 @@ async def test_subscribe_persistent_subscription_to_stream(
 
     await consumer.stop(1)
 
+    read_events = [e for e in consumer.events if type(e) is PersistentSubscriptionEvent]
     events = [
         e
-        for e in consumer.events
+        for e in read_events
         if e.event is not None
         and e.event.type.startswith("test_subscribe_persistent_subscription_to_stream_")
     ]
