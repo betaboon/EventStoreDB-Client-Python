@@ -1,0 +1,74 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: ${{ github.event.number || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    uses: ./.github/workflows/lint.yaml
+    secrets: inherit
+
+  test:
+    uses: ./.github/workflows/test.yaml
+    secrets: inherit
+
+  prepare-release:
+    needs:
+      - lint
+      - test
+    uses: ./.github/workflows/prepare-release.yaml
+    secrets: inherit
+
+  build-package:
+    needs:
+      - prepare-release
+    if: needs.prepare-release.outputs.new-release == 'true'
+    uses: ./.github/workflows/build-package.yaml
+    secrets: inherit
+    with:
+      version: ${{ needs.prepare-release.outputs.version }}
+
+  build-docs:
+    needs:
+      - prepare-release
+    if: needs.prepare-release.outputs.new-release == 'true'
+    uses: ./.github/workflows/build-docs.yaml
+    secrets: inherit
+
+  publish-pypi:
+    needs:
+      - build-package
+      - build-docs
+    uses: ./.github/workflows/publish-pypi.yaml
+    secrets: inherit
+    permissions:
+      id-token: write
+
+  publish-github:
+    needs:
+      - prepare-release
+      - build-package
+      - publish-pypi
+    uses: ./.github/workflows/publish-github.yaml
+    secrets: inherit
+    permissions:
+      contents: write
+    with:
+      version: ${{ needs.prepare-release.outputs.version }}
+      changelog: ${{ needs.prepare-release.outputs.changelog }}
+
+  publish-docs:
+    needs:
+      - build-docs
+      - publish-pypi
+    uses: ./.github/workflows/publish-docs.yaml
+    secrets: inherit
+    permissions:
+      id-token: write
+      pages: write

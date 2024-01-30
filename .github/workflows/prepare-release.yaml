@@ -1,0 +1,46 @@
+name: Prepare release
+
+on:
+  workflow_call:
+    outputs:
+      new-release:
+        description: Whether a new release was made.
+        value: ${{ jobs.release.outputs.released }}
+      version:
+        description: Version of the new release.
+        value: ${{ jobs.release.outputs.version }}
+      changelog:
+        description: Changelog of the new release.
+        value: ${{ jobs.release.outputs.changelog }}
+
+jobs:
+  release:
+    name: Prepare release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+          fetch-depth: 0
+          fetch-tags: true
+      - name: Generate new version
+        id: release
+        uses: python-semantic-release/python-semantic-release@v8.7.2
+        with:
+          commit: false
+          push: false
+          vcs_release: false
+      - name: Set changelog output
+        if: steps.release.outputs.released == 'true'
+        id: changelog
+        run: |
+          {
+            echo 'changelog<<EOF'
+            cat CHANGELOG.md
+            echo EOF
+          } >> "$GITHUB_OUTPUT"
+    outputs:
+      released: ${{ steps.release.outputs.released }}
+      version: ${{ steps.release.outputs.version }}
+      changelog: ${{ steps.changelog.outputs.changelog }}

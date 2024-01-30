@@ -1,39 +1,30 @@
-minimum_pre_commit_version: 3.2.0
-
-default_stages:
-  - pre-commit
-
 default_install_hook_types:
   - pre-commit
   - commit-msg
 
 repos:
-  - repo: https://github.com/psf/black
-    rev: 23.11.0
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
     hooks:
-      - id: black
-  - repo: https://github.com/john-hen/Flake8-pyproject
-    rev: 1.2.3
+      - id: check-added-large-files
+      - id: check-toml
+      - id: trailing-whitespace
+  - repo: https://github.com/ComPWA/mirrors-taplo
+    rev: v0.8.1
     hooks:
-      - id: Flake8-pyproject
-  - repo: https://github.com/pycqa/isort
-    rev: 5.12.0
+      - id: taplo
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.1.14
     hooks:
-      - id: isort
+      - id: ruff
+      - id: ruff-format
   - repo: https://github.com/pre-commit/mirrors-mypy
-    rev: v1.7.1
+    rev: v1.8.0
     hooks:
       - id: mypy
-        exclude: |
-          (?x)^(
-            eventstoredb/generated/.*|
-            tests/.*
-          )$
+        language: system
         args:
           - --strict
-          - --ignore-missing-imports
-          - --implicit-reexport
-          - --follow-imports=silent
   - repo: https://github.com/jorisroovers/gitlint
     rev: v0.19.1
     hooks:

@@ -37,7 +37,7 @@ def eventstoredb_is_ready(url):
 
 @pytest.fixture(scope="session")
 def eventstoredb_service(docker_ip, docker_services):
-    port = docker_services.port_for("eventstore.db", 2113)
+    port = docker_services.port_for("eventstore", 2113)
     url = "http://{}:{}".format(docker_ip, port)
     docker_services.wait_until_responsive(
         timeout=30.0, pause=0.1, check=lambda: eventstoredb_is_ready(url)
@@ -52,7 +52,7 @@ def eventstoredb_host(eventstoredb_service, docker_ip):
 
 @pytest.fixture
 def eventstoredb_port(eventstoredb_service, docker_services):
-    return docker_services.port_for("eventstore.db", 2113)
+    return docker_services.port_for("eventstore", 2113)
 
 
 @pytest.fixture

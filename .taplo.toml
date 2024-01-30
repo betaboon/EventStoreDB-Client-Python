@@ -1,0 +1,22 @@
+[[rule]]
+include = ["pyproject.toml"]
+
+[rule.formatting]
+array_auto_collapse = false
+compact_arrays = true
+compact_inline_tables = true
+indent_string = "    "       # pdm uses 4 spaces
+reorder_arrays = false
+
+[[rule]]
+include = ["pyproject.toml"]
+keys = [
+  "project.dependencies",
+  "project.optional-dependencies",
+  "tool.pdm.dev-dependencies",
+  "tool.ruff.lint",
+  "tool.ruff.per-file-ignores",
+]
+
+[rule.formatting]
+reorder_arrays = true
