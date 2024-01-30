@@ -23,11 +23,10 @@ class ConnectionStringMissingHostError(ConnectionStringError):
         )
 
 
-class ClientException(Exception):
-    ...
+class ClientError(Exception): ...
 
 
-class StreamNotFoundError(ClientException):
+class StreamNotFoundError(ClientError):
     def __init__(self, stream_name: str) -> None:
         self.stream_name = stream_name
         super().__init__(f"Stream '{stream_name}' not found")

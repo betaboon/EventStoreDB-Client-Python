@@ -1,0 +1,39 @@
+name: Test
+
+on:
+  workflow_call:
+
+jobs:
+  test:
+    name: Run tests
+    strategy:
+      matrix:
+        os:
+          - ubuntu-latest
+        python-version:
+          - "3.9"
+          - "3.10"
+          - "3.11"
+          - "3.12"
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Set up PDM
+        uses: pdm-project/setup-pdm@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: true
+      - name: Install dependencies
+        run: pdm sync -G :all
+      - name: Run tests
+        run: pdm run test
+
+  passed:
+    needs:
+      - test
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check test status
+        if: ${{ needs.test.result != 'success' }}
+        run: exit 1

@@ -1,7 +1,7 @@
-from eventstoredb.client.exceptions import ClientException
+from eventstoredb.client.exceptions import ClientError
 
 
-class PersistentSubscriptionError(ClientException):
+class PersistentSubscriptionError(ClientError):
     pass
 
 

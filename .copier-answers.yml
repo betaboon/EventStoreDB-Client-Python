@@ -1,0 +1,21 @@
+# Changes here will be overwritten by Copier
+_commit: 110754b
+_src_path: gh:betaboon/copier-python
+author_email: betaboon@0x80.ninja
+author_name: betaboon
+copyright_holder: betaboon
+copyright_license: Apache-2.0
+copyright_year: '2024'
+project_description: A EventstoreDB gRPC client written in python .
+project_name: EventstoreDB Client Python
+python_console_script: false
+python_import_name: eventstoredb
+python_package_name: eventstoredb
+python_versions:
+- '3.9'
+- '3.10'
+- '3.11'
+- '3.12'
+repository_name: EventStoreDB-Client-Python
+repository_namespace: betaboon
+repository_provider: github

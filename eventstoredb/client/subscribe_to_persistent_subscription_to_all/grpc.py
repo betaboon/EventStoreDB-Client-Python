@@ -1,14 +1,18 @@
 from __future__ import annotations
 
-from eventstoredb.client.subscribe_to_persistent_subscription_to_all.types import (
-    SubscribeToPersistentSubscriptionToAllOptions,
-)
+from typing import TYPE_CHECKING
+
 from eventstoredb.generated.event_store.client import Empty
 from eventstoredb.generated.event_store.client.persistent_subscriptions import (
     ReadReq,
     ReadReqOptions,
     ReadReqOptionsUuidOption,
 )
+
+if TYPE_CHECKING:
+    from eventstoredb.client.subscribe_to_persistent_subscription_to_all.types import (
+        SubscribeToPersistentSubscriptionToAllOptions,
+    )
 
 
 def create_read_request(

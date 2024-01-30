@@ -2,10 +2,11 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Literal
+from typing import TYPE_CHECKING, Literal
 from uuid import UUID, uuid4
 
-from eventstoredb.types import AllPosition, Position, StreamRevision
+if TYPE_CHECKING:
+    from eventstoredb.types import AllPosition, Position, StreamRevision
 
 
 class ContentType(str, Enum):
@@ -46,13 +47,11 @@ class RecordedEvent:
 
 
 @dataclass
-class JsonRecordedEvent(RecordedEvent):
-    ...
+class JsonRecordedEvent(RecordedEvent): ...
 
 
 @dataclass
-class BinaryRecordedEvent(RecordedEvent):
-    ...
+class BinaryRecordedEvent(RecordedEvent): ...
 
 
 @dataclass
@@ -63,13 +62,11 @@ class ReadEvent:
 
 
 @dataclass
-class CaughtUp:
-    ...
+class CaughtUp: ...
 
 
 @dataclass
-class FellBehind:
-    ...
+class FellBehind: ...
 
 
 @dataclass

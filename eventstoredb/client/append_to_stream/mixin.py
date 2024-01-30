@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import AsyncGenerator, Iterable
+from typing import TYPE_CHECKING
 
 from eventstoredb.client.append_to_stream.grpc import (
     convert_append_response,
@@ -14,6 +14,9 @@ from eventstoredb.client.append_to_stream.types import (
 from eventstoredb.client.protocol import ClientProtocol
 from eventstoredb.events import EventData
 from eventstoredb.generated.event_store.client.streams import AppendReq, StreamsStub
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncGenerator, Iterable
 
 
 class AppendToStreamMixin(ClientProtocol):

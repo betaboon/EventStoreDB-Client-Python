@@ -1,0 +1,32 @@
+name: Publish github
+
+on:
+  workflow_call:
+    inputs:
+      version:
+        description: "Version of the package"
+        type: string
+        required: true
+      changelog:
+        description: "Changelog of the package"
+        type: string
+        required: true
+
+jobs:
+  publish-github:
+    name: Publish github release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Download artifacts
+        id: download
+        uses: actions/download-artifact@v3 # needs to mach upload-artifacts in build-package.yaml
+        with:
+          name: package
+      - name: Publish release
+        uses: ncipollo/release-action@v1
+        with:
+          tag: ${{ inputs.version }}
+          body: ${{ inputs.changelog }}
+          artifacts: ${{ steps.download.outputs.download-path }}/*

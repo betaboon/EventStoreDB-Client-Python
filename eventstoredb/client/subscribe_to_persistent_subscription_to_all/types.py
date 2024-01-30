@@ -9,6 +9,5 @@ from eventstoredb.client.subscribe_to_persistent_subscription_to_stream.types im
 
 @dataclass
 class SubscribeToPersistentSubscriptionToAllOptions(
-    SubscribeToPersistentSubscriptionToStreamOptions
-):
-    ...
+    SubscribeToPersistentSubscriptionToStreamOptions,
+): ...

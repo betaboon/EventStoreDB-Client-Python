@@ -6,7 +6,4 @@ from eventstoredb.client.create_persistent_subscription_to_stream.types import (
 
 
 @dataclass
-class UpdatePersistentSubscriptionToStreamOptions(
-    CreatePersistentSubscriptionToStreamOptions
-):
-    pass
+class UpdatePersistentSubscriptionToStreamOptions(CreatePersistentSubscriptionToStreamOptions): ...

@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-from typing import Type
 from uuid import UUID
 
 import betterproto
@@ -35,10 +34,9 @@ from eventstoredb.types import AllPosition
 def get_original_event_id(event: PersistentSubscriptionEvent) -> UUID | None:
     if event.link:
         return event.link.id
-    elif event.event:
+    if event.event:
         return event.event.id
-    else:
-        return None
+    return None
 
 
 def create_read_request(
@@ -103,11 +101,10 @@ def convert_read_response(
     content_type, _ = betterproto.which_one_of(message, "content")
     if content_type == "event":
         return convert_read_response_event(message.event)
-    elif content_type == "subscription_confirmation":
+    if content_type == "subscription_confirmation":
         return convert_read_response_confirmation(message.subscription_confirmation)
-    else:
-        # TODO raise better exception
-        raise Exception("shouldnt be here")
+    # TODO raise better exception
+    raise Exception("shouldnt be here")  # noqa: TRY002,TRY003
 
 
 def convert_read_response_event(
@@ -129,20 +126,17 @@ def convert_read_response_recorded_event(
     message: ReadRespReadEventRecordedEvent,
 ) -> JsonRecordedEvent | BinaryRecordedEvent:
     stream_name = message.stream_identifier.stream_name.decode()
-    id = UUID(message.id.string)
+    event_id = UUID(message.id.string)
     content_type = ContentType(message.metadata["content-type"])
     position = AllPosition(
         commit_position=message.commit_position,
         prepare_position=message.prepare_position,
     )
-    event_class: Type[JsonRecordedEvent] | Type[BinaryRecordedEvent]
-    if content_type == ContentType.JSON:
-        event_class = JsonRecordedEvent
-    else:
-        event_class = BinaryRecordedEvent
+    event_class: type[JsonRecordedEvent] | type[BinaryRecordedEvent]
+    event_class = JsonRecordedEvent if content_type == ContentType.JSON else BinaryRecordedEvent
     return event_class(
         stream_name=stream_name,
-        id=id,
+        id=event_id,
         revision=message.stream_revision,
         type=message.metadata["type"],
         content_type=content_type,

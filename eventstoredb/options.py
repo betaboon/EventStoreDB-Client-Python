@@ -1,4 +1,3 @@
-# flake8: noqa
 from eventstoredb.client.append_to_stream.types import (
     AppendExpectedRevision,
     AppendToStreamOptions,
@@ -36,3 +35,27 @@ from eventstoredb.client.update_persistent_subscription_to_stream.types import (
     UpdatePersistentSubscriptionToStreamOptions,
 )
 from eventstoredb.types import AllPosition, ReadDirection, StreamPosition
+
+__all__ = [
+    "AllPosition",
+    "AppendExpectedRevision",
+    "AppendToStreamOptions",
+    "ClientOptions",
+    "ConsumerStrategy",
+    "CreatePersistentSubscriptionToAllOptions",
+    "CreatePersistentSubscriptionToStreamOptions",
+    "DeletePersistentSubscriptionToAllOptions",
+    "DeletePersistentSubscriptionToStreamOptions",
+    "NackAction",
+    "PersistentSubscriptionSettings",
+    "ReadAllOptions",
+    "ReadDirection",
+    "ReadStreamOptions",
+    "StreamPosition",
+    "SubscribeToAllOptions",
+    "SubscribeToPersistentSubscriptionToAllOptions",
+    "SubscribeToPersistentSubscriptionToStreamOptions",
+    "SubscribeToStreamOptions",
+    "UpdatePersistentSubscriptionToAllOptions",
+    "UpdatePersistentSubscriptionToStreamOptions",
+]

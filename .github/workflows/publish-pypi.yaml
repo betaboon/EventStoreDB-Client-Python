@@ -1,0 +1,21 @@
+name: Publish pypi
+
+on:
+  workflow_call:
+
+jobs:
+  publish-pypi:
+    name: Publish pypi release
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+    steps:
+      - name: Download artifacts
+        id: download
+        uses: actions/download-artifact@v3 # needs to mach upload-artifacts in build-package.yaml
+        with:
+          name: package
+      - name: Publish release
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          packages-dir: ${{ steps.download.outputs.download-path }}

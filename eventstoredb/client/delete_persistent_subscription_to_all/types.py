@@ -4,5 +4,4 @@ from dataclasses import dataclass
 
 
 @dataclass
-class DeletePersistentSubscriptionToAllOptions:
-    ...
+class DeletePersistentSubscriptionToAllOptions: ...

@@ -1,8 +1,35 @@
-*.pyc
-__pycache__
-__pypackages__
-.venv
-.direnv
-.pdm.toml
-dist
-build
+# === python ===
+__pycache__/
+*.py[cod]
+
+# === venv ===
+.venv/
+
+# === pep 582 ===
+__pypackages__/
+
+# === pdm ===
+.pdm-build/
+.pdm-python
+pdm.toml
+dist/
+__version__.py
+
+# === mypy ===
+.mypy_cache/
+
+# === ruff ===
+.ruff_cache/
+
+# === pytest ===
+.pytest_cache/
+
+# === coverage ===
+.coverage
+
+# === sphinx ===
+docs/_build/
+
+# === direnv ===
+.direnv/
+.envrc.local

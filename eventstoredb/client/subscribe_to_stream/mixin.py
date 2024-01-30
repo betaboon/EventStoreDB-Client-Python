@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from typing import AsyncIterator, Union
+from collections.abc import AsyncIterator
+from typing import Union
 
 from eventstoredb.client.protocol import ClientProtocol
 from eventstoredb.client.subscribe_to_stream.grpc import (

@@ -25,8 +25,8 @@ class ClientOptions:
     def from_connection_string(cls, connection_string: str) -> ClientOptions:
         try:
             url = URL(connection_string)
-        except Exception:
-            raise ConnectionStringMalformedError(connection_string)
+        except (TypeError, ValueError) as e:
+            raise ConnectionStringMalformedError(connection_string) from e
 
         if not url.host:
             raise ConnectionStringMissingHostError(connection_string)

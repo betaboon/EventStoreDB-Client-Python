@@ -20,7 +20,7 @@ async def test_read_all(eventstoredb_client: Client) -> None:
             JsonEvent(
                 type="test_read_all_Test1",
                 data=json.dumps({"some": "data"}).encode(),
-            )
+            ),
         ],
     )
     await eventstoredb_client.append_to_stream(
@@ -29,7 +29,7 @@ async def test_read_all(eventstoredb_client: Client) -> None:
             JsonEvent(
                 type="test_read_all_Test2",
                 data=json.dumps({"some": "data"}).encode(),
-            )
+            ),
         ],
     )
 
@@ -38,9 +38,7 @@ async def test_read_all(eventstoredb_client: Client) -> None:
     # the filtering is done because the eventstore is shared across the pytest-session
     raw_events = [e async for e in it]
     read_events = [e for e in raw_events if type(e) is ReadEvent]
-    events = [
-        e for e in read_events if e.event and e.event.type.startswith("test_read_all_")
-    ]
+    events = [e for e in read_events if e.event and e.event.type.startswith("test_read_all_")]
 
     assert len(events) == 2
 
@@ -78,16 +76,14 @@ async def test_read_all_from_start(eventstoredb_client: Client) -> None:
     )
 
     it = eventstoredb_client.read_all(
-        options=ReadAllOptions(from_position=StreamPosition.START)
+        options=ReadAllOptions(from_position=StreamPosition.START),
     )
     # read all events and filter by event-type containing the right prefix
     # the filtering is done because the eventstore is shared across the pytest-session
     raw_events = [e async for e in it]
     read_events = [e for e in raw_events if type(e) is ReadEvent]
     events = [
-        e
-        for e in read_events
-        if e.event and e.event.type.startswith("test_read_all_from_start_")
+        e for e in read_events if e.event and e.event.type.startswith("test_read_all_from_start_")
     ]
 
     assert len(events) == 2
@@ -125,7 +121,7 @@ async def test_read_all_from_position(eventstoredb_client: Client) -> None:
     )
 
     it = eventstoredb_client.read_all(
-        options=ReadAllOptions(from_position=marker.position)
+        options=ReadAllOptions(from_position=marker.position),
     )
     # read all events and filter out all system events (starting with '$')
     raw_events = [e async for e in it]
@@ -165,7 +161,7 @@ async def test_read_all_backwards_from_end(eventstoredb_client: Client) -> None:
         options=ReadAllOptions(
             from_position=StreamPosition.END,
             direction=ReadDirection.BACKWARDS,
-        )
+        ),
     )
     # read all events and filter by event-type containing the right prefix
     # the filtering is done because the eventstore is shared across the pytest-session
@@ -216,14 +212,12 @@ async def test_read_all_backwards_from_position(eventstoredb_client: Client) -> 
             from_position=marker.position,
             direction=ReadDirection.BACKWARDS,
             max_count=2,
-        )
+        ),
     )
     # read all events and filter out all system events (starting with '$')
     raw_events = [e async for e in it]
     read_events = [e for e in raw_events if type(e) is ReadEvent]
     events = [e for e in read_events if e.event and not e.event.type.startswith("$")]
-    for e in events:
-        print(e)
 
     assert len(events) == 2
 
@@ -248,7 +242,7 @@ async def test_read_all_exclude_system_events(eventstoredb_client: Client) -> No
     )
 
     it = eventstoredb_client.read_all(
-        options=ReadAllOptions(filter=ExcludeSystemEventsFilter())
+        options=ReadAllOptions(filter=ExcludeSystemEventsFilter()),
     )
 
     raw_events = [e async for e in it]
@@ -284,9 +278,9 @@ async def test_read_all_filter_by_event_type_regex(eventstoredb_client: Client) 
     it = eventstoredb_client.read_all(
         options=ReadAllOptions(
             filter=EventTypeFilter(
-                regex="test_read_all_filter_by_event_type_regex_Test1"
-            )
-        )
+                regex="test_read_all_filter_by_event_type_regex_Test1",
+            ),
+        ),
     )
 
     events = [e async for e in it]
@@ -315,9 +309,9 @@ async def test_read_all_filter_by_event_type_prefix(
     it = eventstoredb_client.read_all(
         options=ReadAllOptions(
             filter=EventTypeFilter(
-                prefix=["test_read_all_filter_by_event_type_prefix_"]
-            )
-        )
+                prefix=["test_read_all_filter_by_event_type_prefix_"],
+            ),
+        ),
     )
 
     events = [e async for e in it]
@@ -350,7 +344,7 @@ async def test_read_all_filter_by_stream_name_regex(
     )
 
     it = eventstoredb_client.read_all(
-        options=ReadAllOptions(filter=StreamNameFilter(regex=stream_name_1))
+        options=ReadAllOptions(filter=StreamNameFilter(regex=stream_name_1)),
     )
 
     events = [e async for e in it]
@@ -383,7 +377,7 @@ async def test_read_all_filter_by_stream_name_prefix(
     )
 
     it = eventstoredb_client.read_all(
-        options=ReadAllOptions(filter=StreamNameFilter(prefix=["FilterByStreamName"]))
+        options=ReadAllOptions(filter=StreamNameFilter(prefix=["FilterByStreamName"])),
     )
 
     events = [e async for e in it]

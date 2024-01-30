@@ -31,6 +31,6 @@ class PersistentSubscriptionSettings:
 @dataclass
 class CreatePersistentSubscriptionToStreamOptions:
     settings: PersistentSubscriptionSettings = field(
-        default_factory=PersistentSubscriptionSettings
+        default_factory=PersistentSubscriptionSettings,
     )
     from_revision: StreamRevision | StreamPosition = StreamPosition.START

@@ -1,9 +1,8 @@
 from __future__ import annotations
 
-from typing import Type, TypeVar
+from typing import TYPE_CHECKING, TypeVar
 
 from grpclib.const import Status as GRPCStatus
-from grpclib.exceptions import GRPCError
 
 from eventstoredb.client.create_persistent_subscription_to_stream.exceptions import (
     PersistentSubscriptionAlreadyExistsError,
@@ -29,6 +28,9 @@ from eventstoredb.generated.event_store.client.persistent_subscriptions import (
 )
 from eventstoredb.types import StreamPosition, StreamRevision
 
+if TYPE_CHECKING:
+    from grpclib.exceptions import GRPCError
+
 SettingsClass = TypeVar(
     "SettingsClass",
     CreateReqSettings,
@@ -43,8 +45,8 @@ ConsumerStrategyClass = TypeVar(
 
 def create_persistent_subscription_request_settings(
     settings: PersistentSubscriptionSettings,
-    settings_class: Type[SettingsClass],
-    consumer_strategy_class: Type[ConsumerStrategyClass],
+    settings_class: type[SettingsClass],
+    consumer_strategy_class: type[ConsumerStrategyClass],
 ) -> SettingsClass:
     request_settings = settings_class()
     request_settings.resolve_links = settings.resolve_links
@@ -107,11 +109,10 @@ def convert_grpc_error_to_exception(
 ) -> PersistentSubscriptionError | GRPCError:
     if error.status == GRPCStatus.CANCELLED:
         return PersistentSubscriptionDroppedError(error.message)
-    elif error.status == GRPCStatus.NOT_FOUND:
+    if error.status == GRPCStatus.NOT_FOUND:
         return PersistentSubscriptionNotFoundError(error.message)
-    elif error.status == GRPCStatus.ALREADY_EXISTS:
+    if error.status == GRPCStatus.ALREADY_EXISTS:
         return PersistentSubscriptionAlreadyExistsError(error.message)
-    elif error.status == GRPCStatus.FAILED_PRECONDITION:
+    if error.status == GRPCStatus.FAILED_PRECONDITION:
         return PersistentSubscriptionMaxSubscribersReachedError(error.message)
-    else:
-        return error
+    return error
