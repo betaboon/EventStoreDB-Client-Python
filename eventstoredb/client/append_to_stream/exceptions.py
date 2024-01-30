@@ -1,11 +1,15 @@
 from __future__ import annotations
 
-from eventstoredb.client.append_to_stream.types import AppendExpectedRevision
-from eventstoredb.client.exceptions import ClientException
-from eventstoredb.types import StreamRevision
+from typing import TYPE_CHECKING
+
+from eventstoredb.client.exceptions import ClientError
+
+if TYPE_CHECKING:
+    from eventstoredb.client.append_to_stream.types import AppendExpectedRevision
+    from eventstoredb.types import StreamRevision
 
 
-class AppendToStreamError(ClientException):
+class AppendToStreamError(ClientError):
     pass
 
 

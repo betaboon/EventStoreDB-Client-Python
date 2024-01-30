@@ -1,6 +1,7 @@
 from __future__ import annotations
 
-from eventstoredb.client.read_all.types import ReadAllOptions
+from typing import TYPE_CHECKING
+
 from eventstoredb.filters import (
     EventTypeFilter,
     ExcludeSystemEventsFilter,
@@ -19,8 +20,11 @@ from eventstoredb.generated.event_store.client.streams import (
 )
 from eventstoredb.types import AllPosition, ReadDirection, StreamPosition
 
+if TYPE_CHECKING:
+    from eventstoredb.client.read_all.types import ReadAllOptions
 
-def create_read_all_request(options: ReadAllOptions) -> ReadReq:
+
+def create_read_all_request(options: ReadAllOptions) -> ReadReq:  # noqa: C901
     request_options = ReadReqOptions()
 
     request_options.resolve_links = options.resolve_links
@@ -36,12 +40,8 @@ def create_read_all_request(options: ReadAllOptions) -> ReadReq:
 
     if isinstance(options.from_position, AllPosition):
         request_options.all.position = ReadReqOptionsPosition()
-        request_options.all.position.commit_position = (
-            options.from_position.commit_position
-        )
-        request_options.all.position.prepare_position = (
-            options.from_position.prepare_position
-        )
+        request_options.all.position.commit_position = options.from_position.commit_position
+        request_options.all.position.prepare_position = options.from_position.prepare_position
     elif options.from_position == StreamPosition.START:
         request_options.all.start = Empty()
     elif options.from_position == StreamPosition.END:
@@ -61,7 +61,7 @@ def create_read_all_request(options: ReadAllOptions) -> ReadReq:
             if options.filter.prefix:
                 filter_expression.prefix = options.filter.prefix
 
-        if isinstance(options.filter, ExcludeSystemEventsFilter):
+        if isinstance(options.filter, ExcludeSystemEventsFilter):  # noqa: SIM114
             request_options.filter.event_type = filter_expression
         elif isinstance(options.filter, EventTypeFilter):
             request_options.filter.event_type = filter_expression

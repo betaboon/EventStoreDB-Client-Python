@@ -3,7 +3,7 @@ import pytest
 from eventstoredb import Client
 from eventstoredb.exceptions import PersistentSubscriptionNotFoundError
 
-from .utils import EventstoreHTTP
+from .utils import EventstoreHTTP  # noqa: TID252
 
 
 async def test_delete_persistent_subscription_to_all(

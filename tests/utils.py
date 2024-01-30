@@ -3,20 +3,21 @@ from __future__ import annotations
 import asyncio
 from dataclasses import dataclass
 from operator import itemgetter
-from typing import Any, Callable, Coroutine
+from typing import TYPE_CHECKING, Any, Callable
 from urllib.parse import quote
 
-import requests  # type: ignore
+import requests
 
 from eventstoredb.events import CaughtUp, FellBehind, JsonEvent, ReadEvent
-from eventstoredb.subscriptions import PersistentSubscription, Subscription
+
+if TYPE_CHECKING:
+    from collections.abc import Coroutine
+
+    from eventstoredb.subscriptions import PersistentSubscription, Subscription
 
 
 def json_test_events(amount: int) -> list[JsonEvent]:
-    events = []
-    for i in range(amount):
-        events.append(JsonEvent(type=f"Test{i+1}"))
-    return events
+    return [JsonEvent(type=f"Test{i + 1}") for i in range(amount)]
 
 
 @dataclass
@@ -40,9 +41,8 @@ class EventstoreHTTP:
         data = response.json()
         if event_id is not None:
             return data
-        else:
-            events = data.get("entries")
-            return sorted(events, key=itemgetter("positionEventNumber"))
+        events = data.get("entries")
+        return sorted(events, key=itemgetter("positionEventNumber"))
 
     def get_persistent_subscriptions(self, stream_name: str | None = None) -> Any:
         url = f"{self.url}/subscriptions"
@@ -51,9 +51,7 @@ class EventstoreHTTP:
         response = requests.get(url=url)
         return response.json()
 
-    def get_persistent_subscription_details(
-        self, stream_name: str, group_name: str
-    ) -> Any | None:
+    def get_persistent_subscription_details(self, stream_name: str, group_name: str) -> Any | None:
         url = f"{self.url}/subscriptions/{stream_name}/{group_name}/info"
         response = requests.get(url=url)
         if response.status_code == 200:

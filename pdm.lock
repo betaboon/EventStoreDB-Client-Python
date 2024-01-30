@@ -5,7 +5,7 @@
 groups = ["default", "dev", "docs", "linting", "testing"]
 strategy = ["cross_platform"]
 lock_version = "4.4.1"
-content_hash = "sha256:95b6eceb90bec0a754645e4bc48a12d10e34d54fb10ebf740e609f824bcfd8ac"
+content_hash = "sha256:dfda2e55a46450042e89ad0b29f5e6ae42df0f8b6d2fff1c4a3a9144eaccac06"
 
 [[package]]
 name = "alabaster"
@@ -45,6 +45,9 @@ name = "astroid"
 version = "3.0.2"
 requires_python = ">=3.8.0"
 summary = "An abstract syntax tree for Python with inference support."
+dependencies = [
+    "typing-extensions>=4.0.0; python_version < \"3.11\"",
+]
 files = [
     {file = "astroid-3.0.2-py3-none-any.whl", hash = "sha256:d6e62862355f60e716164082d6b4b041d38e2a8cf1c7cd953ded5108bac8ff5c"},
     {file = "astroid-3.0.2.tar.gz", hash = "sha256:4a61cf0a59097c7bb52689b0fd63717cd2a8a14dc9f1eee97b82d814881c8c91"},
@@ -1385,6 +1388,19 @@ files = [
     {file = "tornado-6.4-cp38-abi3-win32.whl", hash = "sha256:6f8a6c77900f5ae93d8b4ae1196472d0ccc2775cc1dfdc9e7727889145c45052"},
     {file = "tornado-6.4-cp38-abi3-win_amd64.whl", hash = "sha256:10aeaa8006333433da48dec9fe417877f8bcc21f48dda8d661ae79da357b2a63"},
     {file = "tornado-6.4.tar.gz", hash = "sha256:72291fa6e6bc84e626589f1c29d90a5a6d593ef5ae68052ee2ef000dfd273dee"},
+]
+
+[[package]]
+name = "types-requests"
+version = "2.31.0.20240125"
+requires_python = ">=3.8"
+summary = "Typing stubs for requests"
+dependencies = [
+    "urllib3>=2",
+]
+files = [
+    {file = "types-requests-2.31.0.20240125.tar.gz", hash = "sha256:03a28ce1d7cd54199148e043b2079cdded22d6795d19a2c2a6791a4b2b5e2eb5"},
+    {file = "types_requests-2.31.0.20240125-py3-none-any.whl", hash = "sha256:9592a9a4cb92d6d75d9b491a41477272b710e021011a2a3061157e2fb1f1a5d1"},
 ]
 
 [[package]]

@@ -1,13 +1,17 @@
 from __future__ import annotations
 
-from eventstoredb.client.delete_persistent_subscription_to_stream.types import (
-    DeletePersistentSubscriptionToStreamOptions,
-)
+from typing import TYPE_CHECKING
+
 from eventstoredb.generated.event_store.client import StreamIdentifier
 from eventstoredb.generated.event_store.client.persistent_subscriptions import (
     DeleteReq,
     DeleteReqOptions,
 )
+
+if TYPE_CHECKING:
+    from eventstoredb.client.delete_persistent_subscription_to_stream.types import (
+        DeletePersistentSubscriptionToStreamOptions,
+    )
 
 
 def create_delete_persistent_subscription_to_stream_request(

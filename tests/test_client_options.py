@@ -4,7 +4,7 @@ from eventstoredb.options import ClientOptions
 
 
 @pytest.mark.parametrize(
-    "connection_string,client_options",
+    ("connection_string", "client_options"),
     [
         (
             "esdb://host",

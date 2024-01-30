@@ -9,7 +9,7 @@ from eventstoredb.events import JsonEvent, JsonRecordedEvent, ReadEvent, Recorde
 from eventstoredb.exceptions import StreamNotFoundError
 from eventstoredb.options import ReadDirection, ReadStreamOptions, StreamPosition
 
-from .utils import json_test_events
+from .utils import json_test_events  # noqa: TID252
 
 
 def recorded_event_type(x: Any) -> str:
@@ -22,12 +22,12 @@ def recorded_event_type(x: Any) -> str:
         return x.event.type
 
 
-@pytest.mark.xfail
+@pytest.mark.xfail()
 def test_recorded_event_type_wrong_type() -> None:
     assert recorded_event_type(None) == "Foo"
 
 
-@pytest.mark.xfail
+@pytest.mark.xfail()
 def test_recorded_event_type_no_event() -> None:
     assert recorded_event_type(ReadEvent()) == "Foo"
 

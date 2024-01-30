@@ -1,8 +1,7 @@
 from __future__ import annotations
 
-from eventstoredb.client.create_persistent_subscription_to_all.types import (
-    CreatePersistentSubscriptionToAllOptions,
-)
+from typing import TYPE_CHECKING
+
 from eventstoredb.client.create_persistent_subscription_to_stream.grpc import (
     create_persistent_subscription_request_settings,
 )
@@ -24,8 +23,13 @@ from eventstoredb.generated.event_store.client.persistent_subscriptions import (
 )
 from eventstoredb.types import AllPosition, StreamPosition
 
+if TYPE_CHECKING:
+    from eventstoredb.client.create_persistent_subscription_to_all.types import (
+        CreatePersistentSubscriptionToAllOptions,
+    )
 
-def create_create_persistent_subscription_to_all_request(
+
+def create_create_persistent_subscription_to_all_request(  # noqa: C901
     group_name: str,
     options: CreatePersistentSubscriptionToAllOptions,
 ) -> CreateReq:
@@ -42,12 +46,8 @@ def create_create_persistent_subscription_to_all_request(
 
     if isinstance(options.from_position, AllPosition):
         request_options.all.position = CreateReqPosition()
-        request_options.all.position.commit_position = (
-            options.from_position.commit_position
-        )
-        request_options.all.position.prepare_position = (
-            options.from_position.prepare_position
-        )
+        request_options.all.position.commit_position = options.from_position.commit_position
+        request_options.all.position.prepare_position = options.from_position.prepare_position
     elif options.from_position == StreamPosition.START:
         request_options.all.start = Empty()
     elif options.from_position == StreamPosition.END:
@@ -67,7 +67,7 @@ def create_create_persistent_subscription_to_all_request(
             if options.filter.prefix:
                 filter_expression.prefix = options.filter.prefix
 
-        if isinstance(options.filter, ExcludeSystemEventsFilter):
+        if isinstance(options.filter, ExcludeSystemEventsFilter):  # noqa: SIM114
             request_options.all.filter.event_type = filter_expression
         elif isinstance(options.filter, EventTypeFilter):
             request_options.all.filter.event_type = filter_expression
@@ -79,8 +79,6 @@ def create_create_persistent_subscription_to_all_request(
         else:
             request_options.all.filter.count = Empty()
 
-        request_options.all.filter.checkpoint_interval_multiplier = (
-            options.checkpoint_interval
-        )
+        request_options.all.filter.checkpoint_interval_multiplier = options.checkpoint_interval
 
     return CreateReq(options=request_options)

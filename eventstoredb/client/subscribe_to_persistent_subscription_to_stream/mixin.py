@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 import asyncio
-from typing import AsyncIterator
+from collections.abc import AsyncIterator
+from typing import TYPE_CHECKING
 
-from grpclib.client import Channel
 from grpclib.exceptions import GRPCError
 
 from eventstoredb.client.create_persistent_subscription_to_stream.grpc import (
@@ -26,6 +26,9 @@ from eventstoredb.generated.event_store.client.persistent_subscriptions import (
     PersistentSubscriptionsStub,
     ReadReq,
 )
+
+if TYPE_CHECKING:
+    from grpclib.client import Channel
 
 
 class SubscribeToPersistentSubscriptionToStreamMixin(ClientProtocol):
@@ -78,7 +81,7 @@ class PersistentSubscription(AsyncIterator[PersistentSubscriptionEvent]):
             try:
                 response = await self._it.__anext__()
             except GRPCError as e:
-                raise convert_grpc_error_to_exception(e)
+                raise convert_grpc_error_to_exception(e)  # noqa: B904,TRY200
             event = convert_read_response(response)
             if isinstance(event, PersistentSubscriptionConfirmation):
                 self.id = event.id

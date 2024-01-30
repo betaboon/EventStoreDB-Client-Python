@@ -1,10 +1,9 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from eventstoredb.client.create_persistent_subscription_to_stream.grpc import (
     create_persistent_subscription_request_settings,
-)
-from eventstoredb.client.update_persistent_subscription_to_stream.types import (
-    UpdatePersistentSubscriptionToStreamOptions,
 )
 from eventstoredb.generated.event_store.client import Empty, StreamIdentifier
 from eventstoredb.generated.event_store.client.persistent_subscriptions import (
@@ -15,6 +14,11 @@ from eventstoredb.generated.event_store.client.persistent_subscriptions import (
     UpdateReqStreamOptions,
 )
 from eventstoredb.types import StreamPosition, StreamRevision
+
+if TYPE_CHECKING:
+    from eventstoredb.client.update_persistent_subscription_to_stream.types import (
+        UpdatePersistentSubscriptionToStreamOptions,
+    )
 
 
 def create_update_persistent_subscription_to_stream_request(

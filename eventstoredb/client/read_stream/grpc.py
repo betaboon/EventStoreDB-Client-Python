@@ -1,12 +1,11 @@
 from __future__ import annotations
 
-from typing import Type
+from typing import TYPE_CHECKING
 from uuid import UUID
 
 import betterproto
 
 from eventstoredb.client.exceptions import StreamNotFoundError
-from eventstoredb.client.read_stream.types import ReadStreamOptions
 from eventstoredb.events import (
     BinaryRecordedEvent,
     CaughtUp,
@@ -33,6 +32,9 @@ from eventstoredb.types import (
     StreamRevision,
 )
 
+if TYPE_CHECKING:
+    from eventstoredb.client.read_stream.types import ReadStreamOptions
+
 
 def create_read_request(stream_name: str, options: ReadStreamOptions) -> ReadReq:
     request_options = ReadReqOptions()
@@ -42,9 +44,9 @@ def create_read_request(stream_name: str, options: ReadStreamOptions) -> ReadReq
     request_options.uuid_option = ReadReqOptionsUuidOption(string=Empty())
 
     if options.direction == ReadDirection.FORWARDS:
-        request_options.read_direction = ReadReqOptionsReadDirection.Forwards  # type: ignore
+        request_options.read_direction = ReadReqOptionsReadDirection.Forwards
     elif options.direction == ReadDirection.BACKWARDS:
-        request_options.read_direction = ReadReqOptionsReadDirection.Backwards  # type: ignore
+        request_options.read_direction = ReadReqOptionsReadDirection.Backwards
 
     request_options.no_filter = Empty()
     request_options.stream = ReadReqOptionsStreamOptions()
@@ -64,17 +66,16 @@ def convert_read_response(message: ReadResp) -> ReadEvent | CaughtUp | FellBehin
     content_type, _ = betterproto.which_one_of(message, "content")
     if content_type == "event":
         return convert_read_response_read_event(message.event)
-    elif content_type == "caught_up":
+    if content_type == "caught_up":
         return CaughtUp()
-    elif content_type == "fell_behind":
+    if content_type == "fell_behind":
         return FellBehind()
-    elif content_type == "stream_not_found":
+    if content_type == "stream_not_found":
         raise StreamNotFoundError(
-            stream_name=message.stream_not_found.stream_identifier.stream_name.decode()
+            stream_name=message.stream_not_found.stream_identifier.stream_name.decode(),
         )
-    else:
-        # FIXME maybe we should raise something like "UnexpectedRuntimeError" here?
-        raise Exception(f"i shouldnt be here {content_type=} {message=}")
+    # FIXME maybe we should raise something like "UnexpectedRuntimeError" here?
+    raise Exception(f"i shouldnt be here {content_type=} {message=}")  # noqa: TRY002,TRY003
 
 
 def convert_read_response_read_event(message: ReadRespReadEvent) -> ReadEvent:
@@ -93,20 +94,17 @@ def convert_read_response_recorded_event(
     message: ReadRespReadEventRecordedEvent,
 ) -> JsonRecordedEvent | BinaryRecordedEvent:
     stream_name = message.stream_identifier.stream_name.decode()
-    id = UUID(message.id.string)
+    event_id = UUID(message.id.string)
     content_type = ContentType(message.metadata["content-type"])
     position = AllPosition(
         commit_position=message.commit_position,
         prepare_position=message.prepare_position,
     )
-    event_class: Type[JsonRecordedEvent] | Type[BinaryRecordedEvent]
-    if content_type == ContentType.JSON:
-        event_class = JsonRecordedEvent
-    else:
-        event_class = BinaryRecordedEvent
+    event_class: type[JsonRecordedEvent] | type[BinaryRecordedEvent]
+    event_class = JsonRecordedEvent if content_type == ContentType.JSON else BinaryRecordedEvent
     return event_class(
         stream_name=stream_name,
-        id=id,
+        id=event_id,
         revision=message.stream_revision,
         type=message.metadata["type"],
         content_type=content_type,

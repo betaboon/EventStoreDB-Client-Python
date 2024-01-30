@@ -4,8 +4,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class ExcludeSystemEventsFilter:
-    ...
+class ExcludeSystemEventsFilter: ...
 
 
 @dataclass

@@ -11,7 +11,7 @@ from eventstoredb.options import (
     StreamPosition,
 )
 
-from .utils import EventstoreHTTP
+from .utils import EventstoreHTTP  # noqa: TID252
 
 
 async def test_create_persistent_subscription_to_all(
@@ -86,9 +86,7 @@ async def test_create_persistent_subscription_to_all_from_start(
 ) -> None:
     await eventstoredb_client.create_persistent_subscription_to_all(
         group_name=group_name,
-        options=CreatePersistentSubscriptionToAllOptions(
-            from_position=StreamPosition.START
-        ),
+        options=CreatePersistentSubscriptionToAllOptions(from_position=StreamPosition.START),
     )
 
     details = eventstoredb_httpclient.get_persistent_subscription_details(
@@ -106,9 +104,7 @@ async def test_create_persistent_subscription_to_all_from_end(
 ) -> None:
     await eventstoredb_client.create_persistent_subscription_to_all(
         group_name=group_name,
-        options=CreatePersistentSubscriptionToAllOptions(
-            from_position=StreamPosition.END
-        ),
+        options=CreatePersistentSubscriptionToAllOptions(from_position=StreamPosition.END),
     )
 
     details = eventstoredb_httpclient.get_persistent_subscription_details(
@@ -153,8 +149,8 @@ async def test_create_persistent_subscription_to_all_filter_by_event_type_regex(
         group_name=group_name,
         options=CreatePersistentSubscriptionToAllOptions(
             filter=EventTypeFilter(
-                regex="create_persistent_subscription_to_all_filter_by_event_type_regex"
-            )
+                regex="create_persistent_subscription_to_all_filter_by_event_type_regex",
+            ),
         ),
     )
 

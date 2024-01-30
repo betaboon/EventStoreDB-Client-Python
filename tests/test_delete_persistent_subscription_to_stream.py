@@ -3,7 +3,7 @@ import pytest
 from eventstoredb import Client
 from eventstoredb.exceptions import PersistentSubscriptionNotFoundError
 
-from .utils import EventstoreHTTP
+from .utils import EventstoreHTTP  # noqa: TID252
 
 
 async def test_delete_persistent_subscription_to_stream(
@@ -17,7 +17,8 @@ async def test_delete_persistent_subscription_to_stream(
         group_name=group_name,
     )
     subscription_before = eventstoredb_httpclient.get_persistent_subscription_details(
-        stream_name=stream_name, group_name=group_name
+        stream_name=stream_name,
+        group_name=group_name,
     )
     assert subscription_before is not None
 

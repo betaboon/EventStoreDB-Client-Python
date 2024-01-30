@@ -1,13 +1,16 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-from eventstoredb.filters import (
-    EventTypeFilter,
-    ExcludeSystemEventsFilter,
-    StreamNameFilter,
-)
 from eventstoredb.types import AllPosition, ReadDirection, StreamPosition
+
+if TYPE_CHECKING:
+    from eventstoredb.filters import (
+        EventTypeFilter,
+        ExcludeSystemEventsFilter,
+        StreamNameFilter,
+    )
 
 
 @dataclass

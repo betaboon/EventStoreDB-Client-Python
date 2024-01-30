@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import betterproto
 
 from eventstoredb.client.append_to_stream.exceptions import (
@@ -12,7 +14,6 @@ from eventstoredb.client.append_to_stream.types import (
     AppendToStreamOptions,
 )
 from eventstoredb.client.exceptions import StreamNotFoundError
-from eventstoredb.events import EventData
 from eventstoredb.generated.event_store.client import Empty, StreamIdentifier, Uuid
 from eventstoredb.generated.event_store.client.streams import (
     AppendReq,
@@ -23,6 +24,9 @@ from eventstoredb.generated.event_store.client.streams import (
     AppendRespWrongExpectedVersion,
 )
 from eventstoredb.types import AllPosition, StreamRevision
+
+if TYPE_CHECKING:
+    from eventstoredb.events import EventData
 
 
 def create_append_header(stream_name: str, options: AppendToStreamOptions) -> AppendReq:
@@ -60,11 +64,12 @@ def convert_append_response(stream_name: str, message: AppendResp) -> AppendResu
             stream_name=stream_name,
             message=message.wrong_expected_version,
         )
-    elif result_type == "success":
+
+    if result_type == "success":
         return convert_append_response_success(message=message.success)
-    else:
-        # TODO raise a more specific exception
-        raise Exception("I shouldnt be here")
+
+    # TODO raise a more specific exception
+    raise Exception("I shouldnt be here")  # noqa: TRY002,TRY003
 
 
 def convert_append_response_success(message: AppendRespSuccess) -> AppendResult:
@@ -92,19 +97,20 @@ def convert_wrong_expected_version(
 
     if expected_type == "expected_no_stream":
         return StreamAlreadyExistsError(stream_name=stream_name)
-    elif expected_type == "expected_stream_exists":
+
+    if expected_type == "expected_stream_exists":
         return StreamNotFoundError(stream_name=stream_name)
-    elif expected_type == "expected_revision" and current_type == "current_no_stream":
+    if expected_type == "expected_revision" and current_type == "current_no_stream":
         return StreamNotFoundError(stream_name=stream_name)
-    elif expected_type == "expected_any" and current_type == "current_no_stream":
+    if expected_type == "expected_any" and current_type == "current_no_stream":
         return StreamNotFoundError(stream_name=stream_name)
-    elif expected_type == "expected_revision" and current_type == "current_revision":
+    if expected_type == "expected_revision" and current_type == "current_revision":
         return RevisionMismatchError(
             stream_name=stream_name,
             expected_revision=message.expected_revision,
             current_revision=message.current_revision,
         )
-    elif expected_type == "expected_any" and current_type == "current_revision":
+    if expected_type == "expected_any" and current_type == "current_revision":
         return RevisionMismatchError(
             stream_name=stream_name,
             expected_revision=AppendExpectedRevision.ANY,

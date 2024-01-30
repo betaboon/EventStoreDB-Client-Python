@@ -8,7 +8,7 @@ from eventstoredb.options import (
     UpdatePersistentSubscriptionToAllOptions,
 )
 
-from .utils import EventstoreHTTP
+from .utils import EventstoreHTTP  # noqa: TID252
 
 
 async def test_update_persistent_subscription_to_all(
@@ -19,7 +19,7 @@ async def test_update_persistent_subscription_to_all(
     await eventstoredb_client.create_persistent_subscription_to_all(
         group_name=group_name,
         options=CreatePersistentSubscriptionToAllOptions(
-            from_position=StreamPosition.START
+            from_position=StreamPosition.START,
         ),
     )
     details_before = eventstoredb_httpclient.get_persistent_subscription_details(
@@ -32,7 +32,7 @@ async def test_update_persistent_subscription_to_all(
     await eventstoredb_client.update_persistent_subscription_to_all(
         group_name=group_name,
         options=UpdatePersistentSubscriptionToAllOptions(
-            from_position=StreamPosition.END
+            from_position=StreamPosition.END,
         ),
     )
 

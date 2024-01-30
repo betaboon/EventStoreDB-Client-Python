@@ -6,7 +6,4 @@ from eventstoredb.client.create_persistent_subscription_to_all.types import (
 
 
 @dataclass
-class UpdatePersistentSubscriptionToAllOptions(
-    CreatePersistentSubscriptionToAllOptions
-):
-    pass
+class UpdatePersistentSubscriptionToAllOptions(CreatePersistentSubscriptionToAllOptions): ...

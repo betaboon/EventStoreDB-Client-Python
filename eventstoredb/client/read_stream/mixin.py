@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import AsyncIterator
+from typing import TYPE_CHECKING
 
 from eventstoredb.client.protocol import ClientProtocol
 from eventstoredb.client.read_stream.grpc import (
@@ -8,8 +8,12 @@ from eventstoredb.client.read_stream.grpc import (
     create_read_request,
 )
 from eventstoredb.client.read_stream.types import ReadStreamOptions
-from eventstoredb.events import CaughtUp, FellBehind, ReadEvent
 from eventstoredb.generated.event_store.client.streams import StreamsStub
+
+if TYPE_CHECKING:
+    from collections.abc import AsyncIterator
+
+    from eventstoredb.events import CaughtUp, FellBehind, ReadEvent
 
 
 class ReadStreamMixin(ClientProtocol):

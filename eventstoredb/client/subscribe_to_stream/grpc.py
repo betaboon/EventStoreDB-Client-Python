@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import betterproto
 
 from eventstoredb.client.read_stream.grpc import convert_read_response
@@ -7,7 +9,6 @@ from eventstoredb.client.subscribe_to_stream.types import (
     SubscribeToStreamOptions,
     SubscriptionConfirmation,
 )
-from eventstoredb.events import CaughtUp, FellBehind, ReadEvent
 from eventstoredb.generated.event_store.client import Empty, StreamIdentifier
 from eventstoredb.generated.event_store.client.streams import (
     ReadReq,
@@ -19,6 +20,9 @@ from eventstoredb.generated.event_store.client.streams import (
     ReadRespSubscriptionConfirmation,
 )
 from eventstoredb.types import StreamPosition, StreamRevision
+
+if TYPE_CHECKING:
+    from eventstoredb.events import CaughtUp, FellBehind, ReadEvent
 
 
 def create_subscribe_to_stream_request(
@@ -50,8 +54,7 @@ def convert_subscribe_to_stream_response(
 
     if content_type == "confirmation":
         return convert_read_response_subscription_confirmation(message.confirmation)
-    else:
-        return convert_read_response(message)
+    return convert_read_response(message)
 
 
 def convert_read_response_subscription_confirmation(

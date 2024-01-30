@@ -56,7 +56,7 @@ repository_url = "https://github.com/betaboon/EventStoreDB-Client-Python/blob/ma
 python_import_name = "eventstoredb"
 
 
-def linkcode_resolve(domain: str, info: dict[str, str]) -> str | None:  # noqa: D103
+def linkcode_resolve(domain: str, info: dict[str, str]) -> str | None:
     if domain != "py":
         return None
 

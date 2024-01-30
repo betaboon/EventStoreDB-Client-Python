@@ -1,10 +1,9 @@
 from __future__ import annotations
 
-from eventstoredb.client.create_persistent_subscription_to_all.grpc import (
+from typing import TYPE_CHECKING
+
+from eventstoredb.client.create_persistent_subscription_to_stream.grpc import (
     create_persistent_subscription_request_settings,
-)
-from eventstoredb.client.update_persistent_subscription_to_all.types import (
-    UpdatePersistentSubscriptionToAllOptions,
 )
 from eventstoredb.generated.event_store.client import Empty
 from eventstoredb.generated.event_store.client.persistent_subscriptions import (
@@ -17,6 +16,11 @@ from eventstoredb.generated.event_store.client.persistent_subscriptions import (
 )
 from eventstoredb.types import AllPosition, StreamPosition
 
+if TYPE_CHECKING:
+    from eventstoredb.client.update_persistent_subscription_to_all.types import (
+        UpdatePersistentSubscriptionToAllOptions,
+    )
+
 
 def create_update_persistent_subscription_to_all_request(
     group_name: str,
@@ -28,12 +32,8 @@ def create_update_persistent_subscription_to_all_request(
 
     if isinstance(options.from_position, AllPosition):
         request_options.all.position = UpdateReqPosition()
-        request_options.all.position.commit_position = (
-            options.from_position.commit_position
-        )
-        request_options.all.position.prepare_position = (
-            options.from_position.prepare_position
-        )
+        request_options.all.position.commit_position = options.from_position.commit_position
+        request_options.all.position.prepare_position = options.from_position.prepare_position
     elif options.from_position == StreamPosition.START:
         request_options.all.start = Empty()
     elif options.from_position == StreamPosition.END:

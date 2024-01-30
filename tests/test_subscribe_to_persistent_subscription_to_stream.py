@@ -11,7 +11,7 @@ from eventstoredb.options import (
     StreamPosition,
 )
 
-from .utils import Consumer, json_test_events
+from .utils import Consumer, json_test_events  # noqa: TID252
 
 
 async def test_subscribe_persistent_subscription_to_stream(
@@ -37,9 +37,7 @@ async def test_subscribe_persistent_subscription_to_stream(
 
     await eventstoredb_client.append_to_stream(
         stream_name=stream_name,
-        events=[
-            JsonEvent(type="test_subscribe_persistent_subscription_to_stream_Test")
-        ],
+        events=[JsonEvent(type="test_subscribe_persistent_subscription_to_stream_Test")],
     )
 
     await consumer.stop(1)
@@ -64,14 +62,12 @@ async def test_subscribe_persistent_subscription_to_stream_raises_if_not_exist(
     stream_name: str,
     group_name: str,
 ) -> None:
+    subscription = eventstoredb_client.subscribe_to_persistent_subscription_to_stream(
+        stream_name=stream_name,
+        group_name=group_name,
+    )
+    consumer = Consumer(subscription)
     with pytest.raises(PersistentSubscriptionNotFoundError):
-        subscription = (
-            eventstoredb_client.subscribe_to_persistent_subscription_to_stream(
-                stream_name=stream_name,
-                group_name=group_name,
-            )
-        )
-        consumer = Consumer(subscription)
         await consumer.run_for(1)
 
 
@@ -93,9 +89,7 @@ async def test_subscribe_persistent_subscription_to_stream_from_start(
     await eventstoredb_client.create_persistent_subscription_to_stream(
         stream_name=stream_name,
         group_name=group_name,
-        options=CreatePersistentSubscriptionToStreamOptions(
-            from_revision=StreamPosition.START
-        ),
+        options=CreatePersistentSubscriptionToStreamOptions(from_revision=StreamPosition.START),
     )
 
     subscription = eventstoredb_client.subscribe_to_persistent_subscription_to_stream(

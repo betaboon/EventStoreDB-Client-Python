@@ -11,7 +11,7 @@ from eventstoredb.exceptions import (
 )
 from eventstoredb.options import AppendExpectedRevision, AppendToStreamOptions
 
-from .utils import EventstoreHTTP as HTTPClient
+from .utils import EventstoreHTTP as HTTPClient  # noqa: TID252
 
 
 async def test_append_to_stream_one_json(
@@ -33,7 +33,7 @@ async def test_append_to_stream_one_json(
     assert e["eventType"] == "TestEvent"
     assert e["eventNumber"] == 0
     assert e["isJson"] is True
-    assert e["data"] == ""
+    assert e["data"] == ""  # noqa: PLC1901
     assert e["isMetaData"] is False
     assert e["metaData"] is None
 
@@ -105,7 +105,7 @@ async def test_append_to_stream_one_json_with_metadata(
     assert e["eventType"] == "TestEvent"
     assert e["eventNumber"] == 0
     assert e["isJson"] is True
-    assert e["data"] == ""
+    assert e["data"] == ""  # noqa: PLC1901
     assert e["isMetaData"] is True
     assert json.loads(e["metaData"]) == {"meta": "data"}
 
@@ -182,9 +182,7 @@ async def test_append_to_stream_expected_revision_no_stream(
 ) -> None:
     await eventstoredb_client.append_to_stream(
         stream_name=stream_name,
-        options=AppendToStreamOptions(
-            expected_revision=AppendExpectedRevision.NO_STREAM
-        ),
+        options=AppendToStreamOptions(expected_revision=AppendExpectedRevision.NO_STREAM),
         events=JsonEvent(type="TestEvent"),
     )
 
@@ -205,9 +203,7 @@ async def test_append_to_stream_expected_revision_no_stream_but_exists(
     with pytest.raises(StreamAlreadyExistsError) as execinfo:
         await eventstoredb_client.append_to_stream(
             stream_name=stream_name,
-            options=AppendToStreamOptions(
-                expected_revision=AppendExpectedRevision.NO_STREAM
-            ),
+            options=AppendToStreamOptions(expected_revision=AppendExpectedRevision.NO_STREAM),
             events=JsonEvent(type="Test2"),
         )
 
@@ -226,9 +222,7 @@ async def test_append_to_stream_expected_revision_stream_exists(
 
     await eventstoredb_client.append_to_stream(
         stream_name=stream_name,
-        options=AppendToStreamOptions(
-            expected_revision=AppendExpectedRevision.STREAM_EXISTS
-        ),
+        options=AppendToStreamOptions(expected_revision=AppendExpectedRevision.STREAM_EXISTS),
         events=JsonEvent(type="Test2"),
     )
 
@@ -245,9 +239,7 @@ async def test_append_to_stream_expected_revision_stream_exists_but_not_exist(
     with pytest.raises(StreamNotFoundError) as execinfo:
         await eventstoredb_client.append_to_stream(
             stream_name=stream_name,
-            options=AppendToStreamOptions(
-                expected_revision=AppendExpectedRevision.STREAM_EXISTS
-            ),
+            options=AppendToStreamOptions(expected_revision=AppendExpectedRevision.STREAM_EXISTS),
             events=JsonEvent(type="TestEvent"),
         )
     assert execinfo.value.stream_name == stream_name

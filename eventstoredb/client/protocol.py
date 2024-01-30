@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import Protocol
+from typing import TYPE_CHECKING, Protocol
 
-from grpclib.client import Channel
+if TYPE_CHECKING:
+    from grpclib.client import Channel
 
 
 class ClientProtocol(Protocol):
     @property
-    def channel(self) -> Channel:
-        ...
+    def channel(self) -> Channel: ...

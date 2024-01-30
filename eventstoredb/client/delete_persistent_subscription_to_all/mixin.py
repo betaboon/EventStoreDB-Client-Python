@@ -35,4 +35,4 @@ class DeletePersistentSubscriptionToAllMixin(ClientProtocol):
         try:
             await client.delete(delete_req=request)
         except GRPCError as e:
-            raise convert_grpc_error_to_exception(e)
+            raise convert_grpc_error_to_exception(e)  # noqa: B904,TRY200

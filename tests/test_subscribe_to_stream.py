@@ -4,7 +4,7 @@ from eventstoredb import Client
 from eventstoredb.events import CaughtUp, JsonEvent, ReadEvent
 from eventstoredb.options import StreamPosition, SubscribeToStreamOptions
 
-from .utils import Consumer, json_test_events
+from .utils import Consumer, json_test_events  # noqa: TID252
 
 
 async def test_subscribe_to_stream_json(
